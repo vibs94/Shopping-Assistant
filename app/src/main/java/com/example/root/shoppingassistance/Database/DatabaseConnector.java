@@ -73,11 +73,12 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         super(context, dbName, null, db_version);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         //create Item table
         String Create_Item_Table="CREATE TABLE "+Table_Item+"("
-                +Key_Item_ID+" INTEGER PRIMARY KEY,"
+                +Key_Item_ID+" INTEGER PRIMARY KEY autoincrement,"
                 +Key_Item_Name+" TEXT,"
                 +Key_Item_type_ID+" INTEGER,"
                 +Key_Item_Price+" FLOAT,"
@@ -86,13 +87,13 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
         //create Item_type table
         String Create_Item_Type_Table="CREATE TABLE "+Table_Item_Type+"("
-                +Key_Item_type_ID+" INTEGER PRIMARY KEY,"
+                +Key_Item_type_ID+" INTEGER PRIMARY KEY autoincrement,"
                 +Key_Item_Type_Name+" TEXT,"
                 +")";
 
         //create Attribute table
         String Create_Attribute_Table="CREATE TABLE "+Table_Attribute+"("
-                +Key_Attribute_ID+" INTEGER PRIMARY KEY,"
+                +Key_Attribute_ID+" INTEGER PRIMARY KEY autoincrement,"
                 +Key_Attribute_Name+" TEXT,"
                 +")";
 
@@ -108,7 +109,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
         //create Attribute type table
         String Create_Attribute_Type_Table="CREATE TABLE "+Table_Attribute_Type+"("
-                +Key_Attribute_Type_ID+" INTEGER PRIMARY KEY,"
+                +Key_Attribute_Type_ID+" INTEGER PRIMARY KEY autoincrement,"
                 +Key_Attribute_type_Name+" TEXT,"
                 +")";
 
@@ -124,7 +125,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
         //create Item table
         String Create_Shop_Table="CREATE TABLE "+Table_Shop+"("
-                +Key_Shop_ID+" INTEGER PRIMARY KEY,"
+                +Key_Shop_ID+" INTEGER PRIMARY KEY autoincrement,"
                 +Key_Shop_Name+" TEXT,"
                 +Key_Shop_Address+" TEXT,"
                 +")";

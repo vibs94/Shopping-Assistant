@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Item {
 
+    private String name;
     private  String category;
     private Shop shop;
     private double price;
@@ -59,5 +60,12 @@ public class Item {
     public void addAttribute(Attribute attribute){
         attributes.add(attribute);
     }
-//dasdasdad
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
