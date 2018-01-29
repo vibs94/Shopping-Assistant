@@ -8,6 +8,7 @@ public class Attribute {
 
     private String attributeType;
     private String attributeName;
+    private int attributeIndex;
 
     public String getAttributeType() {
         return attributeType;
@@ -23,5 +24,13 @@ public class Attribute {
 
     public void setAttributeName(String attributeName) {
         this.attributeName = attributeName;
+    }
+
+    public int getAttributeIndex() {
+        return attributeIndex;
+    }
+
+    public void setAttributeIndex(int attributeIndex) {
+        this.attributeIndex = attributeIndex;
     }
 }

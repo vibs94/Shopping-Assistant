@@ -39,15 +39,19 @@ public class DatabaseConnector extends SQLiteOpenHelper {
 
     //Attribute type table
     private final static String Table_Attribute_Type="attribute_type";
-    //attribute table columns
+    //attribute type table columns
     private final static String Key_Attribute_Type_ID="attribute_type_id";
     private final static String Key_Attribute_type_Name="attribute_type_name";
 
     //ItemAttribute table
     private final static String Table_Item_Attribute="item_attribute";
+    //ItemAttribute table column
+    private final static String Key_Attribute_index="attribute_index";
 
     //ItemTypeAttributeType table
     private final static String Table_Item_Type_Attribute_type="item_type_attribute_type";
+    //ItemTypeAttributeType table column
+    private final static String Key_Attribute_Type_index="attribute_type_index";
 
     //Shop table
     private final static String Table_Shop="shop";
@@ -101,6 +105,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         String Create_Item_Attribute_Table = "CREATE TABLE "+Table_Item_Attribute+"("
                 +Key_Attribute_ID+" INTEGER ,"
                 +Key_Item_ID+" INTEGER,"
+                +Key_Attribute_index+" INTEGER,"
                 +"FOREIGN KEY ("+Key_Attribute_ID+") REFERENCES "+Table_Attribute+" ("+Key_Attribute_ID+")"
                 +"ON DELETE CASCADE ON UPDATE NO ACTION,"
                 +"FOREIGN KEY ("+Key_Item_ID+") REFERENCES "+Table_Item+" ("+Key_Item_ID+")"
@@ -117,6 +122,7 @@ public class DatabaseConnector extends SQLiteOpenHelper {
         String Create_Item_Type_Attribute_Type_Table = "CREATE TABLE "+Table_Item_Type_Attribute_type+"("
                 +Key_Attribute_Type_ID+" INTEGER ,"
                 +Key_Item_type_ID+" INTEGER,"
+                +Key_Attribute_Type_index+" INTEGER,"
                 +"FOREIGN KEY ("+Key_Attribute_Type_ID+") REFERENCES "+Table_Attribute_Type+" ("+Key_Attribute_Type_ID+")"
                 +"ON DELETE CASCADE ON UPDATE NO ACTION,"
                 +"FOREIGN KEY ("+Key_Item_type_ID+") REFERENCES "+Table_Item_Type+" ("+Key_Item_type_ID+")"
