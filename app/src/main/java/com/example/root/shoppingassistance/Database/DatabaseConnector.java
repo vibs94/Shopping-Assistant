@@ -7,9 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-/**
- * Created by root on 1/28/18.
- */
 
 public class DatabaseConnector extends SQLiteOpenHelper {
 

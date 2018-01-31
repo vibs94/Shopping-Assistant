@@ -1,9 +1,5 @@
 package com.example.root.shoppingassistance.Model;
 
-/**
- * Created by vibodha on 1/29/18.
- */
-
 public class Attribute {
 
     private String attributeType;

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by vibodha on 1/29/18.
- */
 
 public class Item {
 

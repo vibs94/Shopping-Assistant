@@ -29,15 +29,14 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private EditText txtq;
     private EditText txta;
     String startText = "What are you looking for ?";
-    String errorMessage = "Be more specific !";
-    private ArrayList<String> itemAttribs;
+    String errorMessage = "Invalid request !";
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ShoppingAssistanceController shoppingAssistanceController = new ShoppingAssistanceController();
     boolean isStarted = false;
     int index =1;
     String message;
 
-    public ShoppingAssistanceView(){
+    public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
     }
 
@@ -59,6 +58,12 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             public void onClick(View arg0) {
                 // Method yet to be defined
                 isStarted = false;
+                index =1;
+                try {
+                    shoppingAssistanceController = new ShoppingAssistanceController();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 speakOut(startText);
             }
 
@@ -71,7 +76,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         if (text.length() == 0) {
             txtq.setText(text);
             tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
-        } else {
+        }
+        else if(text.equals("success")){
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+        else {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
             getSpeechInput();
         }
@@ -150,10 +159,10 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     }
 
     public void startChat(String s) throws ParseException {
-        if(shoppingAssistanceController.getItems(s)!=null){
+        if(shoppingAssistanceController.getItemsOfCategory(s).size()>0){
             isStarted = true;
             print("started");
-            message = "what is "+shoppingAssistanceController.getFirstQ()+" ?";
+            message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
             speakOut(message);
         }
         else{
@@ -171,16 +180,20 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         if(shoppingAssistanceController.nextQuestion(index,s).equals("invalid")) {
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage);
+            speakOut(errorMessage+" you said "+s+" !");
             print(errorMessage);
 
+        }
+        else if(shoppingAssistanceController.nextQuestion(index,s).equals("success")){
+            print("success");
+            speakOut("success");
         }
         else{
             message = "what is "+shoppingAssistanceController.nextQuestion(index,s)+" ?";
             print(message);
             index++;
             speakOut(message);
-            Toast.makeText(getApplicationContext(), itemAttribs.get(0),
+            Toast.makeText(getApplicationContext(), s,
                     Toast.LENGTH_LONG).show();
         }
     }

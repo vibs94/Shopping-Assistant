@@ -10,9 +10,6 @@ import com.example.root.shoppingassistance.Model.Item;
 
 import java.util.List;
 
-/**
- * Created by vibodha on 1/30/18.
- */
 
 public class ItemDB {
 
