@@ -12,7 +12,6 @@ import com.example.root.shoppingassistance.R;
 public class MainActivity extends AppCompatActivity {
 
     DatabaseConnector dbCon;
-    TextView txtTest;
 
     public MainActivity() {
         dbCon=DatabaseConnector.getInstance(this);
@@ -22,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        txtTest = (TextView) findViewById(R.id.txtTest);
     }
 
     public void addTest(View view){

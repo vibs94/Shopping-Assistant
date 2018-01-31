@@ -12,9 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.root.shoppingassistance.Controller.ShoppingAssistanceController;
 import com.example.root.shoppingassistance.Database.DatabaseConnector;
 import com.example.root.shoppingassistance.R;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -30,6 +32,10 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     String errorMessage = "Be more specific !";
     private ArrayList<String> itemAttribs;
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    ShoppingAssistanceController shoppingAssistanceController = new ShoppingAssistanceController();
+    boolean isStarted = false;
+    int index =1;
+    String message;
 
     public ShoppingAssistanceView(){
         dbCon=DatabaseConnector.getInstance(this);
@@ -52,6 +58,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
             public void onClick(View arg0) {
                 // Method yet to be defined
+                isStarted = false;
                 speakOut(startText);
             }
 
@@ -125,22 +132,60 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     txta.setText(result.get(0));
                     Toast.makeText(getApplicationContext(), result.get(0),
                             Toast.LENGTH_LONG).show();
-                    continueChat(result.get(0));
+
+                    print(result.get(0));
+                    try {
+                        if(isStarted) {
+                            continueChat(result.get(0));
+                        }
+                        else {
+                            startChat(result.get(0));
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
     }
 
-    public void continueChat(String s){
-        itemAttribs = dbCon.getItemAttribs(s);
-        if(itemAttribs.size()>0) {
-            Toast.makeText(getApplicationContext(), itemAttribs.get(0),
-                    Toast.LENGTH_LONG).show();
+    public void startChat(String s) throws ParseException {
+        if(shoppingAssistanceController.getItems(s)!=null){
+            isStarted = true;
+            print("started");
+            message = "what is "+shoppingAssistanceController.getFirstQ()+" ?";
+            speakOut(message);
         }
         else{
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
             speakOut(errorMessage);
+            print(errorMessage);
+
         }
+
+    }
+
+    public void continueChat(String s) throws ParseException {
+
+        if(shoppingAssistanceController.nextQuestion(index,s).equals("invalid")) {
+            Toast.makeText(getApplicationContext(), errorMessage,
+                    Toast.LENGTH_LONG).show();
+            speakOut(errorMessage);
+            print(errorMessage);
+
+        }
+        else{
+            message = "what is "+shoppingAssistanceController.nextQuestion(index,s)+" ?";
+            print(message);
+            index++;
+            speakOut(message);
+            Toast.makeText(getApplicationContext(), itemAttribs.get(0),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void print(String s){
+        Log.e("message",s);
     }
 }

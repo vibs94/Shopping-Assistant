@@ -1,5 +1,7 @@
 package com.example.root.shoppingassistance.Controller;
 
+import android.util.Log;
+
 import com.example.root.shoppingassistance.Model.Attribute;
 import com.example.root.shoppingassistance.Model.Item;
 import com.example.root.shoppingassistance.Model.Shop;
@@ -19,18 +21,13 @@ public class ShoppingAssistanceController {
     List<Item> items = new ArrayList<Item>();
     int i;
 
-    public ShoppingAssistanceController(String category) throws ParseException {
-        getItems(category);
-    }
-
     public List<Item> getItems(String category) throws ParseException {
 
-        if (category.equals("trouser")) {
-            List<Item> items = new ArrayList<Item>();
+        if (category.equals("shirt")) {
 
             Item item1 = new Item();
-            item1.setCategory("trouser");
-            item1.setName("regular demin");
+            item1.setCategory("shirt");
+            item1.setName("formal");
             item1.setPrice(3000);
             String sDate = "2018-01-31";
             Date date = new SimpleDateFormat("yyyy-mm-dd").parse(sDate);
@@ -41,30 +38,28 @@ public class ShoppingAssistanceController {
             item1.setShop(shop);
             Attribute attribute = new Attribute("gender", "male", 1);
             item1.addAttribute(attribute);
-            attribute = new Attribute("category", "denim", 4);
+            attribute = new Attribute("type", "formal", 2);
             item1.addAttribute(attribute);
-            attribute = new Attribute("type", "regular", 2);
-            item1.addAttribute(attribute);
-            attribute = new Attribute("size", "32", 3);
+            attribute = new Attribute("size", "medium", 3);
             item1.addAttribute(attribute);
 
             items.add(item1);
 
             Item item2 = new Item();
-            item2.setCategory("trouser");
-            item2.setName("casual regular");
+            item2.setCategory("shirt");
+            item2.setName("casual");
             item2.setPrice(3000);
             item2.setDateOfPurchace(date);
             item2.setShop(shop);
             attribute = new Attribute("gender", "male", 1);
             item2.addAttribute(attribute);
-            attribute = new Attribute("category", "casual", 4);
+            attribute = new Attribute("type", "casual", 2);
             item2.addAttribute(attribute);
-            attribute = new Attribute("type", "regular", 2);
-            item2.addAttribute(attribute);
-            attribute = new Attribute("size", "32", 3);
+            attribute = new Attribute("size", "large", 3);
             item2.addAttribute(attribute);
 
+            items.add(item2);
+            print("list created");
             return items;
         }
         else{
@@ -77,6 +72,7 @@ public class ShoppingAssistanceController {
 
         String nextQ = "invalid";
         if (items==null||items.isEmpty()){
+            print(nextQ+" con");
             return nextQ;
         }
         else{
@@ -86,9 +82,19 @@ public class ShoppingAssistanceController {
                     return items.get(i).getAttributes().get(index).getAttributeType();
                 }
             }
+            print(nextQ+" con");
             return nextQ;
 
         }
+    }
+
+    public String getFirstQ(){
+        print(String.valueOf(items.size()));
+        return items.get(0).getAttributes().get(0).getAttributeType();
+    }
+
+    private void print(String s){
+        Log.e("message",s);
     }
 
 }
