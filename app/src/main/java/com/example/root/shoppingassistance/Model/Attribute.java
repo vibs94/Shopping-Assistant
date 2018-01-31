@@ -10,6 +10,12 @@ public class Attribute {
     private String attributeName;
     private int attributeIndex;
 
+    public Attribute(String attributeType, String attributeName, int attributeIndex) {
+        this.attributeType = attributeType;
+        this.attributeName = attributeName;
+        this.attributeIndex = attributeIndex;
+    }
+
     public String getAttributeType() {
         return attributeType;
     }

@@ -18,7 +18,7 @@ import com.example.root.shoppingassistance.R;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ShoppingAssistance extends AppCompatActivity implements TextToSpeech.OnInitListener {
+public class ShoppingAssistanceView extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
     DatabaseConnector dbCon;
 
@@ -31,7 +31,7 @@ public class ShoppingAssistance extends AppCompatActivity implements TextToSpeec
     private ArrayList<String> itemAttribs;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
-    public ShoppingAssistance(){
+    public ShoppingAssistanceView(){
         dbCon=DatabaseConnector.getInstance(this);
     }
 

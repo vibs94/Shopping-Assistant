@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startShopping(View view){
-        Intent myIntent = new Intent(this, ShoppingAssistance.class);
+        Intent myIntent = new Intent(this, ShoppingAssistanceView.class);
         startActivity(myIntent);
     }
 }
