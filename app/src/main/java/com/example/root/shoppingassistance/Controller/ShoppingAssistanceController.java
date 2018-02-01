@@ -38,7 +38,7 @@ public class ShoppingAssistanceController {
             shop.setShopName("Nolimit");
             shop.setAddress("752,Galle Rd,Colombo 06");
             item1.setShop(shop);
-            Attribute attribute = new Attribute("type", "formal", 1);
+            Attribute attribute = new Attribute("type ? formal or casual", "formal", 1);
             item1.addAttribute(attribute);
             attribute = new Attribute("size", "medium", 2);
             item1.addAttribute(attribute);
@@ -51,7 +51,7 @@ public class ShoppingAssistanceController {
             item2.setPrice(3000);
             item2.setDateOfPurchace(date);
             item2.setShop(shop);
-            attribute = new Attribute("type", "casual", 1);
+            attribute = new Attribute("type ? formal or casual", "casual", 1);
             item2.addAttribute(attribute);
             attribute = new Attribute("size", "large", 2);
             item2.addAttribute(attribute);
