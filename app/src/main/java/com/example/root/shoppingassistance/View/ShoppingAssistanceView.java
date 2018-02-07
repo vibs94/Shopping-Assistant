@@ -159,7 +159,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     }
 
     public void startChat(String s) throws ParseException {
-        if(shoppingAssistanceController.getItemsOfCategory(s).size()>0){
+        if(shoppingAssistanceController.getItemsOfCategory(s.toLowerCase()).size()>0){
             isStarted = true;
             print("started");
             message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
@@ -168,7 +168,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         else{
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage);
+            speakOut(errorMessage+" you said "+s.toLowerCase()+" !");
             print(errorMessage);
 
         }
@@ -177,19 +177,19 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     public void continueChat(String s) throws ParseException {
 
-        if(shoppingAssistanceController.nextQuestion(index,s).equals("invalid")) {
+        if(shoppingAssistanceController.nextQuestion(index,s.toLowerCase()).equals("invalid")) {
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage+" you said "+s+" !");
+            speakOut(errorMessage+" you said "+s.toLowerCase()+" !");
             print(errorMessage);
 
         }
-        else if(shoppingAssistanceController.nextQuestion(index,s).equals("success")){
+        else if(shoppingAssistanceController.nextQuestion(index,s.toLowerCase()).equals("success")){
             print("success");
             speakOut("success");
         }
         else{
-            message = "what is "+shoppingAssistanceController.nextQuestion(index,s)+" ?";
+            message = "what is "+shoppingAssistanceController.nextQuestion(index,s.toLowerCase())+" ?";
             print(message);
             index++;
             speakOut(message);
