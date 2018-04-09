@@ -28,13 +28,12 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private Button btnSpeak;
     private EditText txtq;
     private EditText txta;
-    String startText = "What are you looking for ?";
     String errorMessage = "Invalid request !";
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ShoppingAssistanceController shoppingAssistanceController = new ShoppingAssistanceController();
     boolean isStarted = false;
     int index =1;
-    String message;
+    String message = "What are you looking for ?";;
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -64,7 +63,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                speakOut(startText);
+                speakOut(message);
             }
 
         });
@@ -138,7 +137,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             case REQ_CODE_SPEECH_INPUT:
                 if (resultCode == RESULT_OK && data != null) {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    txta.setText(result.get(0));
+
                     Toast.makeText(getApplicationContext(), result.get(0),
                             Toast.LENGTH_LONG).show();
 
@@ -161,10 +160,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     public void startChat(ArrayList<String> s) throws ParseException {
 
         int valid = 0;
-
+        printList(s);
         for(int i=0;i<s.size();i++){
             if(shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size()>0){
                 isStarted = true;
+                txta.setText(s.get(i));
                 print("started");
                 message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
                 speakOut(message);
@@ -177,9 +177,9 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         if(valid==0){
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage);
+            speakOut(errorMessage+" "+message);
             print(errorMessage);
-
+            txta.setText(errorMessage);
         }
 
     }
@@ -187,12 +187,14 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     public void continueChat(ArrayList<String> s) throws ParseException {
 
         int valid = 0;
-
+        printList(s);
         for(int i=0;i<s.size();i++){
             if(shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase()).equals("invalid")) {
                 continue;
             }
             else if(shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase()).equals("success")){
+                txtq.setText("success");
+                txta.setText("success");
                 print("success");
                 speakOut("success");
                 valid=1;
@@ -200,6 +202,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
             else{
                 message = "what is "+shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase())+" ?";
+                txta.setText(s.get(i));
                 print(message);
                 index++;
                 speakOut(message);
@@ -213,8 +216,9 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         if(valid==0){
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage);
+            speakOut(errorMessage+ " "+message);
             print(errorMessage);
+            txta.setText(errorMessage);
         }
 
 
@@ -222,5 +226,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     private void print(String s){
         Log.e("message",s);
+    }
+
+    private void printList(ArrayList<String> s){
+        for(int i=0;i<s.size();i++){
+            System.out.println(s.get(i));
+        }
     }
 }
