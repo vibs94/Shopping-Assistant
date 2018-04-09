@@ -145,10 +145,10 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     print(result.get(0));
                     try {
                         if(isStarted) {
-                            continueChat(result.get(0));
+                            continueChat(result);
                         }
                         else {
-                            startChat(result.get(0));
+                            startChat(result);
                         }
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -158,44 +158,66 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         }
     }
 
-    public void startChat(String s) throws ParseException {
-        if(shoppingAssistanceController.getItemsOfCategory(s.toLowerCase()).size()>0){
-            isStarted = true;
-            print("started");
-            message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
-            speakOut(message);
+    public void startChat(ArrayList<String> s) throws ParseException {
+
+        int valid = 0;
+
+        for(int i=0;i<s.size();i++){
+            if(shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size()>0){
+                isStarted = true;
+                print("started");
+                message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
+                speakOut(message);
+                valid=1;
+                break;
+            }
+
         }
-        else{
+
+        if(valid==0){
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage+" you said "+s.toLowerCase()+" !");
+            speakOut(errorMessage);
             print(errorMessage);
 
         }
 
     }
 
-    public void continueChat(String s) throws ParseException {
+    public void continueChat(ArrayList<String> s) throws ParseException {
 
-        if(shoppingAssistanceController.nextQuestion(index,s.toLowerCase()).equals("invalid")) {
+        int valid = 0;
+
+        for(int i=0;i<s.size();i++){
+            if(shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase()).equals("invalid")) {
+                continue;
+            }
+            else if(shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase()).equals("success")){
+                print("success");
+                speakOut("success");
+                valid=1;
+                break;
+            }
+            else{
+                message = "what is "+shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase())+" ?";
+                print(message);
+                index++;
+                speakOut(message);
+                Toast.makeText(getApplicationContext(), s.get(i),
+                        Toast.LENGTH_LONG).show();
+                valid=1;
+                break;
+            }
+        }
+
+        if(valid==0){
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
-            speakOut(errorMessage+" you said "+s.toLowerCase()+" !");
+            speakOut(errorMessage);
             print(errorMessage);
+        }
 
-        }
-        else if(shoppingAssistanceController.nextQuestion(index,s.toLowerCase()).equals("success")){
-            print("success");
-            speakOut("success");
-        }
-        else{
-            message = "what is "+shoppingAssistanceController.nextQuestion(index,s.toLowerCase())+" ?";
-            print(message);
-            index++;
-            speakOut(message);
-            Toast.makeText(getApplicationContext(), s,
-                    Toast.LENGTH_LONG).show();
-        }
+
     }
 
     private void print(String s){
