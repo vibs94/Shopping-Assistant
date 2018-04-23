@@ -53,12 +53,12 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:text="Start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/btnSpeak"
-        android:onClick="sta"
-        android:layout_marginTop="140dp"
+        android:layout_width="134dp"
+        android:layout_height="177dp"
         android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="140dp"
+        android:onClick="sta"
+        android:text="Start" />
 </RelativeLayout>

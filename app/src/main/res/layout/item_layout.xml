@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.Items">
+
+
+    <EditText
+        android:id="@+id/item_name"
+        android:layout_width="286dp"
+        android:layout_height="34dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="19dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        tools:ignore="RtlCompat" />
+
+    <EditText
+        android:id="@+id/item_price"
+        android:layout_width="67dp"
+        android:layout_height="34dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/item_name"
+        android:layout_alignParentRight="true" />"
+        android:layout_marginEnd="13dp"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/item_shop"
+        android:layout_width="372dp"
+        android:layout_height="21dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/item_name"
+        android:layout_marginTop="60dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:layout_alignLeft="@+id/item_name" />
+</RelativeLayout>

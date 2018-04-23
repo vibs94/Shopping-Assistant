@@ -99,8 +99,6 @@ public class ShoppingAssistanceController {
             return nextQ;
         }
         else{
-            print(categoryItems.get(0).getCategory());
-            print(String.valueOf(index)+" con");
             for (i=0;i<categoryItems.size();i++){
                 if(categoryItems.get(i).getAttributes().get(index-1).getAttributeName().equals(lastResponse)) {
                     if (index < categoryItems.get(i).getAttributes().size()) {
