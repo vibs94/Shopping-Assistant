@@ -30,7 +30,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private EditText txta;
     String errorMessage = "Invalid request !";
     private final int REQ_CODE_SPEECH_INPUT = 100;
-    ShoppingAssistanceController shoppingAssistanceController = new ShoppingAssistanceController();
+    ShoppingAssistanceController shoppingAssistanceController = ShoppingAssistanceController.getInstance();
     boolean isStarted = false;
     int index = 1;
     String message = "What are you looking for ?";
@@ -59,11 +59,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 message = "What are you looking for ?";
                 isStarted = false;
                 index =1;
-                try {
-                    shoppingAssistanceController = new ShoppingAssistanceController();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                shoppingAssistanceController = ShoppingAssistanceController.getInstance();
                 speakOut(message);
             }
 
@@ -202,7 +198,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 txta.setText("success");
                 print("success");
                 speakOut("success");
-                
+
                 valid=1;
                 break;
             }

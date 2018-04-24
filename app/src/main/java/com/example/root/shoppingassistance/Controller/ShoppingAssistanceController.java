@@ -19,9 +19,22 @@ public class ShoppingAssistanceController {
     List<Item> categoryItems = new ArrayList<Item>();
     int i;
 
-    public ShoppingAssistanceController() throws ParseException {
+    private static ShoppingAssistanceController shoppingAssistanceController=  null;
+
+    private ShoppingAssistanceController() throws ParseException {
         getItems();
         categoryItems = new ArrayList<Item>();
+    }
+
+    public static ShoppingAssistanceController getInstance(){
+        if(shoppingAssistanceController==null){
+            try {
+                shoppingAssistanceController=new ShoppingAssistanceController();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return shoppingAssistanceController;
     }
 
     public List<Item> getItems() throws ParseException {
