@@ -45,12 +45,16 @@ public class ShoppingAssistanceController {
 
             items.add(item1);
 
+
             Item item2 = new Item();
             item2.setCategory("shirt");
             item2.setName("casual");
             item2.setPrice(3000);
             item2.setDateOfPurchace(date);
-            item2.setShop(shop);
+            Shop shop2 = new Shop();
+            shop2.setShopName("Fashion Bug");
+            shop2.setAddress("25,Galle Rd,Moratuwa");
+            item2.setShop(shop2);
             attribute = new Attribute("type ? formal or casual", "casual", 1);
             item2.addAttribute(attribute);
             attribute = new Attribute("size", "large", 2);
@@ -63,7 +67,10 @@ public class ShoppingAssistanceController {
             item3.setName("smart phone");
             item3.setPrice(3000);
             item3.setDateOfPurchace(date);
-            item3.setShop(shop);
+            Shop shop3 = new Shop();
+            shop3.setShopName("IDealz");
+            shop3.setAddress("6,Liberty Plaza,Colombo 4");
+            item3.setShop(shop3);
             attribute = new Attribute("kind ? smart phone or normal phone", "smartphone", 1);
             item3.addAttribute(attribute);
             attribute = new Attribute("brand", "apple", 2);
@@ -73,23 +80,49 @@ public class ShoppingAssistanceController {
 
             items.add(item3);
 
+            Item item4 = new Item();
+            item4.setCategory("mobile");
+            item4.setName("smart phone");
+            item4.setPrice(3000);
+            item4.setDateOfPurchace(date);
+            Shop shop4 = new Shop();
+            shop4.setShopName("Greenware");
+            shop4.setAddress("61,Liberty Plaza,Colombo 4");
+            item4.setShop(shop4);
+            attribute = new Attribute("kind ? smart phone or normal phone", "smartphone", 1);
+            item4.addAttribute(attribute);
+            attribute = new Attribute("brand", "apple", 2);
+            item4.addAttribute(attribute);
+            attribute = new Attribute("model", "iphone 6", 3);
+            item4.addAttribute(attribute);
+
+            items.add(item4);
+
+            Item item5 = new Item();
+            item5.setCategory("mobile");
+            item5.setName("samsung smart phone");
+            item5.setPrice(3000);
+            item5.setDateOfPurchace(date);
+            Shop shop5 = new Shop();
+            shop5.setShopName("Greenware");
+            shop5.setAddress("61,Liberty Plaza,Colombo 4");
+            item5.setShop(shop5);
+            attribute = new Attribute("kind ? smart phone or normal phone", "smartphone", 1);
+            item5.addAttribute(attribute);
+            attribute = new Attribute("brand", "samsung", 2);
+            item5.addAttribute(attribute);
+            attribute = new Attribute("model", "S 6", 3);
+            item5.addAttribute(attribute);
+
+            items.add(item5);
+
             print("list created");
             return items;
 
 
     }
 
-    public List<Item> getItemsOfCategory(String s){
 
-
-        for(i=0;i<items.size();i++){
-            if(items.get(i).getCategory().equals(s)){
-                categoryItems.add(items.get(i));
-            }
-        }
-
-        return categoryItems;
-    }
 
     public String nextQuestion(int index,String lastResponse){
 
@@ -99,18 +132,31 @@ public class ShoppingAssistanceController {
             return nextQ;
         }
         else{
-            for (i=0;i<categoryItems.size();i++){
-                if(categoryItems.get(i).getAttributes().get(index-1).getAttributeName().equals(lastResponse)) {
-                    if (index < categoryItems.get(i).getAttributes().size()) {
-                        return categoryItems.get(i).getAttributes().get(index).getAttributeType();
-                    }
-                    else{
-                        return "success";
+            if(categoryItems.size()>0) {
+                print("index "+String.valueOf(index));
+                print("last response: "+lastResponse);
+                for (i = 0; i < categoryItems.size(); i++) {
+                    if (!categoryItems.get(i).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
+                        print("removed attribute "+categoryItems.get(i).getAttributes().get((index-1)).getAttributeName());
+                        categoryItems.remove(i);
+                        i--;
                     }
                 }
             }
-            print(nextQ+" con");
-            return nextQ;
+            if(categoryItems.size()>0) {
+                if (index < categoryItems.get(0).getAttributes().size()) {
+                    print("att type return "+categoryItems.get(0).getAttributes().get(index).getAttributeType());
+                    return categoryItems.get(0).getAttributes().get(index).getAttributeType();
+
+                } else {
+                    print(String.valueOf(categoryItems.size()) + " con");
+                    return "success";
+                }
+            }
+            else {
+                print(nextQ + " con");
+                return nextQ;
+            }
 
         }
     }
@@ -124,4 +170,17 @@ public class ShoppingAssistanceController {
         Log.e("message",s);
     }
 
+    public List<Item> getItemsOfCategory(String s) {
+        for(i=0;i<items.size();i++){
+            if(items.get(i).getCategory().equals(s)){
+                categoryItems.add(items.get(i));
+            }
+        }
+
+        return categoryItems;
+    }
+
+    public List<Item> getCategoryItems() {
+        return categoryItems;
+    }
 }

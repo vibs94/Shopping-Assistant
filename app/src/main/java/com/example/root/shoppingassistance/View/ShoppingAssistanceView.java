@@ -32,8 +32,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ShoppingAssistanceController shoppingAssistanceController = new ShoppingAssistanceController();
     boolean isStarted = false;
-    int index =1;
-    String message = "What are you looking for ?";;
+    int index = 1;
+    String message = "What are you looking for ?";
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -56,6 +56,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
             public void onClick(View arg0) {
                 // Method yet to be defined
+                message = "What are you looking for ?";
                 isStarted = false;
                 index =1;
                 try {
@@ -160,12 +161,14 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     public void startChat(ArrayList<String> s) throws ParseException {
 
         int valid = 0;
-        printList(s);
+        int categorySize;
         for(int i=0;i<s.size();i++){
-            if(shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size()>0){
+            print("result "+String.valueOf(i)+" "+s.get(i));
+            categorySize = shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size();
+            if(categorySize>0){
                 isStarted = true;
                 txta.setText(s.get(i));
-                print("started");
+                print("started "+String.valueOf(categorySize));
                 message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
                 speakOut(message);
                 valid=1;
@@ -186,22 +189,25 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     public void continueChat(ArrayList<String> s) throws ParseException {
 
+        String response;
         int valid = 0;
-        printList(s);
         for(int i=0;i<s.size();i++){
-            if(shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase()).equals("invalid")) {
+            print("result "+String.valueOf(i)+" "+s.get(i));
+            response = shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase());
+            if(response.equals("invalid")) {
                 continue;
             }
-            else if(shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase()).equals("success")){
+            else if(response.equals("success")){
                 txtq.setText("success");
                 txta.setText("success");
                 print("success");
                 speakOut("success");
+                
                 valid=1;
                 break;
             }
             else{
-                message = "what is "+shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase())+" ?";
+                message = "what is "+response+" ?";
                 txta.setText(s.get(i));
                 print(message);
                 index++;
@@ -228,9 +234,4 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         Log.e("message",s);
     }
 
-    private void printList(ArrayList<String> s){
-        for(int i=0;i<s.size();i++){
-            System.out.println(s.get(i));
-        }
-    }
 }
