@@ -12,6 +12,7 @@ public class Item {
     private Shop shop;
     private double price;
     private Date dateOfPurchace;
+    private int noOfPurchaces = 0;
     private List<Attribute> attributes = new ArrayList<Attribute>();
 
     public String getCategory() {
@@ -64,5 +65,13 @@ public class Item {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getNoOfPurchaces() {
+        return noOfPurchaces;
+    }
+
+    public void setNoOfPurchaces(int noOfPurchaces) {
+        this.noOfPurchaces = noOfPurchaces;
     }
 }

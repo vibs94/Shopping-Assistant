@@ -9,6 +9,7 @@ import com.example.root.shoppingassistance.Model.Shop;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class ShoppingAssistanceController {
             item1.addAttribute(attribute);
             attribute = new Attribute("size", "medium", 2);
             item1.addAttribute(attribute);
+            item1.setNoOfPurchaces(1);
 
             items.add(item1);
 
@@ -72,13 +74,14 @@ public class ShoppingAssistanceController {
             item2.addAttribute(attribute);
             attribute = new Attribute("size", "large", 2);
             item2.addAttribute(attribute);
+            item2.setNoOfPurchaces(2);
 
             items.add(item2);
 
             Item item3 = new Item();
             item3.setCategory("mobile");
             item3.setName("smart phone");
-            item3.setPrice(3000);
+            item3.setPrice(74000.00);
             item3.setDateOfPurchace(date);
             Shop shop3 = new Shop();
             shop3.setShopName("IDealz");
@@ -90,13 +93,14 @@ public class ShoppingAssistanceController {
             item3.addAttribute(attribute);
             attribute = new Attribute("model", "iphone 6", 3);
             item3.addAttribute(attribute);
+            item3.setNoOfPurchaces(1);
 
             items.add(item3);
 
             Item item4 = new Item();
             item4.setCategory("mobile");
             item4.setName("smart phone");
-            item4.setPrice(3000);
+            item4.setPrice(73000.00);
             item4.setDateOfPurchace(date);
             Shop shop4 = new Shop();
             shop4.setShopName("Greenware");
@@ -108,6 +112,7 @@ public class ShoppingAssistanceController {
             item4.addAttribute(attribute);
             attribute = new Attribute("model", "iphone 6", 3);
             item4.addAttribute(attribute);
+            item4.setNoOfPurchaces(2);
 
             items.add(item4);
 
@@ -126,6 +131,7 @@ public class ShoppingAssistanceController {
             item5.addAttribute(attribute);
             attribute = new Attribute("model", "S 6", 3);
             item5.addAttribute(attribute);
+            item5.setNoOfPurchaces(1);
 
             items.add(item5);
 
@@ -196,7 +202,33 @@ public class ShoppingAssistanceController {
     }
 
     public List<Item> getCategoryItems() {
-        
-        return categoryItems;
+
+        List<Item> orderedItems =  new ArrayList<Item>();
+        List<Double> scores = new ArrayList<Double>();
+
+        for(int i = 0;i<categoryItems.size();i++){
+            scores.add(getItemScore(categoryItems.get(i)));
+        }
+
+        int index;
+        for(int i = 0;i<scores.size();i++){
+            index = scores.indexOf(Collections.max(scores));
+            orderedItems.add(categoryItems.get(index));
+            scores.set(index,Double.NEGATIVE_INFINITY);
+        }
+
+        return orderedItems;
+    }
+
+    private double getItemScore(Item item){
+
+        double score;
+        double currentDate = (double) (new Date().getTime()-(item.getDateOfPurchace().getTime()))/Math.pow(10.0,7.0);
+
+        print("currentDate " + String.valueOf(currentDate));
+
+        score = currentDate*item.getNoOfPurchaces()/item.getPrice();
+        print(String.valueOf(item.getPrice())+" score "+String.valueOf(score));
+        return score;
     }
 }
