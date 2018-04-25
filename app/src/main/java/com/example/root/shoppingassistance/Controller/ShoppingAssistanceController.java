@@ -16,7 +16,7 @@ import java.util.List;
 public class ShoppingAssistanceController {
 
     List<Item> items = new ArrayList<Item>();
-    List<Item> categoryItems = new ArrayList<Item>();
+    List<Item> categoryItems;
     int i;
 
     private static ShoppingAssistanceController shoppingAssistanceController=  null;
@@ -184,6 +184,7 @@ public class ShoppingAssistanceController {
     }
 
     public List<Item> getItemsOfCategory(String s) {
+        categoryItems = new ArrayList<Item>();
         for(i=0;i<items.size();i++){
             if(items.get(i).getCategory().equals(s)){
                 categoryItems.add(items.get(i));

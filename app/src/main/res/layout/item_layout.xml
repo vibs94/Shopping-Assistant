@@ -2,11 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".View.Items">
+    android:layout_height="match_parent">
 
 
-    <EditText
+    <TextView
         android:id="@+id/item_name"
         android:layout_width="286dp"
         android:layout_height="34dp"
@@ -14,11 +13,11 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="11dp"
         android:layout_marginTop="19dp"
+        android:textSize="20dp"
         android:ems="10"
-        android:inputType="textPersonName"
         tools:ignore="RtlCompat" />
 
-    <EditText
+    <TextView
         android:id="@+id/item_price"
         android:layout_width="67dp"
         android:layout_height="34dp"
@@ -26,17 +25,18 @@
         android:layout_alignTop="@+id/item_name"
         android:layout_alignParentRight="true" />"
         android:layout_marginEnd="13dp"
+        android:textSize="20dp"
         android:ems="10"
         android:inputType="textPersonName" />
 
-    <EditText
+    <TextView
         android:id="@+id/item_shop"
         android:layout_width="372dp"
-        android:layout_height="21dp"
+        android:layout_height="34dp"
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/item_name"
         android:layout_marginTop="60dp"
+        android:textSize="20dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:layout_alignLeft="@+id/item_name" />
 </RelativeLayout>

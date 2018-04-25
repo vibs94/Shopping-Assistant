@@ -55,10 +55,15 @@
     <Button
         android:id="@+id/btnSpeak"
         android:layout_width="134dp"
-        android:layout_height="177dp"
+        android:layout_height="61dp"
         android:layout_below="@+id/textView2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="140dp"
-        android:onClick="sta"
+        android:layout_marginTop="80dp"
         android:text="Start" />
+
+    <ListView
+        android:id="@+id/list_item"
+        android:layout_width="fill_parent"
+        android:layout_height="177dp"
+        android:layout_marginTop="180dp"></ListView>
 </RelativeLayout>

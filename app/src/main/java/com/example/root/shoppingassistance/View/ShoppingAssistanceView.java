@@ -10,14 +10,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.root.shoppingassistance.Controller.ShoppingAssistanceController;
 import com.example.root.shoppingassistance.Database.DatabaseConnector;
+import com.example.root.shoppingassistance.ListAdapter.ItemListAdapter;
+import com.example.root.shoppingassistance.Model.Item;
 import com.example.root.shoppingassistance.R;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class ShoppingAssistanceView extends AppCompatActivity implements TextToSpeech.OnInitListener {
@@ -34,6 +38,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     boolean isStarted = false;
     int index = 1;
     String message = "What are you looking for ?";
+    ListView listView;
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -51,16 +56,13 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
         // Refer 'Speak' button
         btnSpeak = (Button) findViewById(R.id.btnSpeak);
+        listView = (ListView) findViewById(R.id.list_item);
+        listView.setVisibility(View.GONE);
         // Handle onClick event for button 'Speak'
         btnSpeak.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View arg0) {
-                // Method yet to be defined
-                message = "What are you looking for ?";
-                isStarted = false;
-                index =1;
-                shoppingAssistanceController = ShoppingAssistanceController.getInstance();
-                speakOut(message);
+                start();
             }
 
         });
@@ -198,7 +200,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 txta.setText("success");
                 print("success");
                 speakOut("success");
-
+                generateList();
                 valid=1;
                 break;
             }
@@ -230,4 +232,20 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         Log.e("message",s);
     }
 
+    private void start(){
+        txtq.setText("");
+        txta.setText("");
+        message = "What are you looking for ?";
+        isStarted = false;
+        index =1;
+        shoppingAssistanceController = ShoppingAssistanceController.getInstance();
+        speakOut(message);
+    }
+
+    private void generateList(){
+        List<Item> items = shoppingAssistanceController.getCategoryItems();
+        ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
+        listView.setAdapter(itemListAdapter);
+        listView.setVisibility(View.VISIBLE);
+    }
 }
