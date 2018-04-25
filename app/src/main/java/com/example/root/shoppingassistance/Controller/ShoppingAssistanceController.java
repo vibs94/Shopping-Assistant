@@ -149,28 +149,29 @@ public class ShoppingAssistanceController {
                 print("index "+String.valueOf(index));
                 print("last response: "+lastResponse);
                 for (i = 0; i < categoryItems.size(); i++) {
-                    if (!categoryItems.get(i).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
-                        print("removed attribute "+categoryItems.get(i).getAttributes().get((index-1)).getAttributeName());
-                        categoryItems.remove(i);
-                        i--;
+                    if (categoryItems.get(i).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
+                        if (index < categoryItems.get(i).getAttributes().size()) {
+                            print("att type return "+categoryItems.get(0).getAttributes().get(index).getAttributeType());
+                            nextQ = categoryItems.get(i).getAttributes().get(index).getAttributeType();
+                            for (int j = 0; j < categoryItems.size(); j++) {
+                                if (!categoryItems.get(j).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
+                                    print("removed attribute "+categoryItems.get(j).getAttributes().get((index-1)).getAttributeName());
+                                    categoryItems.remove(j);
+                                    j--;
+                                    i--;
+                                }
+                            }
+                            return nextQ;
+                        } else {
+                            print(String.valueOf(categoryItems.size()) + " con");
+                            return "success";
+                        }
                     }
                 }
-            }
-            if(categoryItems.size()>0) {
-                if (index < categoryItems.get(0).getAttributes().size()) {
-                    print("att type return "+categoryItems.get(0).getAttributes().get(index).getAttributeType());
-                    return categoryItems.get(0).getAttributes().get(index).getAttributeType();
 
-                } else {
-                    print(String.valueOf(categoryItems.size()) + " con");
-                    return "success";
-                }
             }
-            else {
-                print(nextQ + " con");
-                return nextQ;
-            }
-
+            print(nextQ + " con");
+            return nextQ;
         }
     }
 
@@ -195,6 +196,7 @@ public class ShoppingAssistanceController {
     }
 
     public List<Item> getCategoryItems() {
+        
         return categoryItems;
     }
 }
