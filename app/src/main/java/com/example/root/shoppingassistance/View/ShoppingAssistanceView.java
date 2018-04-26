@@ -39,6 +39,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     int index = 1;
     String message = "What are you looking for ?";
     ListView listView;
+    int success = 0;
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -70,17 +71,26 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     //method to speak
     private void speakOut(String text) {
-        txtq.setText(text);
-        if (text.length() == 0) {
+        if(success==0) {
             txtq.setText(text);
-            tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+            if (text.length() == 0) {
+                txtq.setText(text);
+                tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+            } else if (text.equals("success")) {
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            } else {
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                getSpeechInput();
+            }
         }
-        else if(text.equals("success")){
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-        }
-        else {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-            getSpeechInput();
+        else{
+            print("read list");
+            if (text.length() == 0) {
+                tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+            } else {
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                getSpeechInput();
+            }
         }
 
     }
@@ -141,15 +151,20 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                             Toast.LENGTH_LONG).show();
 
                     print(result.get(0));
-                    try {
-                        if(isStarted) {
-                            continueChat(result);
+                    if(success==0){
+                        try {
+                            if(isStarted) {
+                                continueChat(result);
+                            }
+                            else {
+                                startChat(result);
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
-                        else {
-                            startChat(result);
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                    }
+                    else {
+                        addItem(result);
                     }
                 }
                 break;
@@ -247,5 +262,33 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
         listView.setAdapter(itemListAdapter);
         listView.setVisibility(View.VISIBLE);
+        String itemList = "Here are the suggestions. ";
+        for(int i = 0;i<items.size();i++){
+            itemList = itemList + " " + String.valueOf(i+1)+". "+ items.get(i).getName() + " for "+ String.valueOf(items.get(i).getPrice())+" rupees from "+items.get(i).getShop().getShopName() + ". ";
+        }
+        success = 1;
+        speakOut(itemList+"What kind of "+items.get(0).getCategory()+" do you want? ");
+
+    }
+
+    private void addItem(ArrayList<String> s){
+        int selected = 0;
+        for(int i=0;i<s.size();i++) {
+            try {
+                Integer.parseInt(s.get(i));
+                selected = 1;
+                print("selected");
+                success = 0;
+                txtq.setText("Selected");
+                txta.setText("Selected");
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        if(selected==0){
+            txtq.setText("Invalid");
+            txta.setText("Invalid");
+            speakOut("Invalid!");
+        }
     }
 }
