@@ -18,6 +18,8 @@ public class ShoppingAssistanceController {
 
     List<Item> items = new ArrayList<Item>();
     List<Item> categoryItems;
+    List<Item> orderedItems;
+    List<Item> cart = new ArrayList<Item>();
     int i;
 
     private static ShoppingAssistanceController shoppingAssistanceController=  null;
@@ -203,7 +205,7 @@ public class ShoppingAssistanceController {
 
     public List<Item> getCategoryItems() {
 
-        List<Item> orderedItems =  new ArrayList<Item>();
+        orderedItems =  new ArrayList<Item>();
         List<Double> scores = new ArrayList<Double>();
 
         for(int i = 0;i<categoryItems.size();i++){
@@ -230,5 +232,13 @@ public class ShoppingAssistanceController {
         score = currentDate*item.getNoOfPurchaces()/item.getPrice();
         print(String.valueOf(item.getPrice())+" score "+String.valueOf(score));
         return score;
+    }
+
+    public List<Item> getCart(){
+        return cart;
+    }
+
+    public void addToCart(int index){
+        cart.add(orderedItems.get(index-1));
     }
 }

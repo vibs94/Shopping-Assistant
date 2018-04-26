@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.root.shoppingassistance.Controller.ShoppingAssistanceController;
 import com.example.root.shoppingassistance.Database.DatabaseConnector;
+import com.example.root.shoppingassistance.ListAdapter.CartListAdapter;
 import com.example.root.shoppingassistance.ListAdapter.ItemListAdapter;
 import com.example.root.shoppingassistance.Model.Item;
 import com.example.root.shoppingassistance.R;
@@ -29,6 +30,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     DatabaseConnector dbCon;
 
     private TextToSpeech tts;
+    private Button btnStart;
     private Button btnSpeak;
     private EditText txtq;
     private EditText txta;
@@ -38,7 +40,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     boolean isStarted = false;
     int index = 1;
     String message = "What are you looking for ?";
-    ListView listView;
+    ListView itemListView;
+    ListView cartListView;
     int success = 0;
 
     public ShoppingAssistanceView() throws ParseException {
@@ -56,16 +59,25 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         txta = (EditText) findViewById(R.id.txtA);
 
         // Refer 'Speak' button
-        btnSpeak = (Button) findViewById(R.id.btnSpeak);
-        listView = (ListView) findViewById(R.id.list_item);
-        listView.setVisibility(View.GONE);
+        btnStart = (Button) findViewById(R.id.btnSpeak);
+        btnSpeak = (Button) findViewById(R.id.btnS);
+        itemListView = (ListView) findViewById(R.id.list_item);
+        itemListView.setVisibility(View.GONE);
+        cartListView = (ListView) findViewById(R.id.list_cart);
+        cartListView.setVisibility(View.GONE);
         // Handle onClick event for button 'Speak'
-        btnSpeak.setOnClickListener(new View.OnClickListener() {
+        btnStart.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View arg0) {
                 start();
             }
 
+        });
+        btnSpeak.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSpeechInput();
+            }
         });
     }
 
@@ -83,8 +95,15 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 getSpeechInput();
             }
         }
-        else{
-            print("read list");
+        else if(success==1){
+            if (text.length() == 0) {
+                tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+            } else {
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                getSpeechInput();
+            }
+        }
+        else if(success==2){
             if (text.length() == 0) {
                 tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
             } else {
@@ -111,7 +130,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             // Enable the button - It was disabled in main.xml (Go back and
             // Check it)
             else {
-                btnSpeak.setEnabled(true);
+                btnStart.setEnabled(true);
             }
             // TTS is not initialized properly
         } else {
@@ -163,8 +182,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                             e.printStackTrace();
                         }
                     }
-                    else {
+                    else if(success==1){
                         addItem(result);
+                    }
+                    else if(success==2){
+                        addMore(result);
                     }
                 }
                 break;
@@ -253,6 +275,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         message = "What are you looking for ?";
         isStarted = false;
         index =1;
+        success = 0;
+        itemListView.setVisibility(View.GONE);
         shoppingAssistanceController = ShoppingAssistanceController.getInstance();
         speakOut(message);
     }
@@ -260,8 +284,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private void generateList(){
         List<Item> items = shoppingAssistanceController.getCategoryItems();
         ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
-        listView.setAdapter(itemListAdapter);
-        listView.setVisibility(View.VISIBLE);
+        itemListView.setAdapter(itemListAdapter);
+        itemListView.setVisibility(View.VISIBLE);
         String itemList = "Here are the suggestions. ";
         for(int i = 0;i<items.size();i++){
             itemList = itemList + " " + String.valueOf(i+1)+". "+ items.get(i).getName() + " for "+ String.valueOf(items.get(i).getPrice())+" rupees from "+items.get(i).getShop().getShopName() + ". ";
@@ -273,15 +297,20 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     private void addItem(ArrayList<String> s){
         int selected = 0;
+        print("Succ "+String.valueOf(success));
         for(int i=0;i<s.size();i++) {
             try {
-                Integer.parseInt(s.get(i));
+                print(s.get(i));
+                int selectedItem = Integer.parseInt(s.get(i));
+                shoppingAssistanceController.addToCart(selectedItem);
                 selected = 1;
                 print("selected");
-                success = 0;
                 txtq.setText("Selected");
                 txta.setText("Selected");
-            } catch (Exception e) {
+                generateCart();
+                break;
+            } catch (NumberFormatException e) {
+                print("cont");
                 continue;
             }
         }
@@ -289,6 +318,31 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             txtq.setText("Invalid");
             txta.setText("Invalid");
             speakOut("Invalid!");
+        }
+    }
+
+    private void generateCart(){
+        List<Item> items = shoppingAssistanceController.getCart();
+        CartListAdapter cartListAdapter = new CartListAdapter(getApplicationContext(),items);
+        cartListView.setAdapter(cartListAdapter);
+        cartListView.setVisibility(View.VISIBLE);
+        success = 2;
+        speakOut("Do you want to add more items to the cart ?");
+    }
+
+    private void addMore(ArrayList<String> s){
+        for(int i = 0;i<s.size();i++){
+            if(s.get(i).toLowerCase().equals("yes")){
+                success = 0;
+                start();
+            }
+            else if(s.get(i).toLowerCase().equals("no")){
+                itemListView.setVisibility(View.GONE);
+                success = 0;
+            }
+            else{
+                speakOut("Invalid!");
+            }
         }
     }
 }
