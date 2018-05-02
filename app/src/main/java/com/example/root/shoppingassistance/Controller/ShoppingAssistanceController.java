@@ -19,6 +19,7 @@ public class ShoppingAssistanceController {
     List<Item> items = new ArrayList<Item>();
     List<Item> categoryItems;
     List<Item> orderedItems;
+    List<Item> removedItems;
     List<Item> cart = new ArrayList<Item>();
     int i;
     double range;
@@ -165,7 +166,7 @@ public class ShoppingAssistanceController {
                             for (int j = 0; j < categoryItems.size(); j++) {
                                 if (!categoryItems.get(j).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
                                     print("removed attribute "+categoryItems.get(j).getAttributes().get((index-1)).getAttributeName());
-                                    categoryItems.remove(j);
+                                    removedItems.add(0,categoryItems.remove(j));
                                     j--;
                                     i--;
                                 }
@@ -195,6 +196,7 @@ public class ShoppingAssistanceController {
 
     public List<Item> getItemsOfCategory(String s) {
         categoryItems = new ArrayList<Item>();
+        removedItems = new ArrayList<Item>();
         for(i=0;i<items.size();i++){
             if(items.get(i).getCategory().equals(s)){
                 categoryItems.add(items.get(i));
@@ -240,7 +242,12 @@ public class ShoppingAssistanceController {
     }
 
     public void addToCart(int index){
-        cart.add(orderedItems.get(index-1));
+        if(index<=orderedItems.size()) {
+            cart.add(orderedItems.get(index - 1));
+        }
+        else{
+            cart.add(removedItems.get(index-orderedItems.size()-1));
+        }
     }
 
     public void setRange(double range){
@@ -249,5 +256,9 @@ public class ShoppingAssistanceController {
 
     public double getRange(){
         return range;
+    }
+
+    public List<Item> getRemovedItems(){
+        return removedItems;
     }
 }

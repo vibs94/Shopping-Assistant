@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -300,12 +301,18 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     private void generateList(){
         List<Item> items = shoppingAssistanceController.getCategoryItems();
+        List<Item> removedItems = shoppingAssistanceController.getRemovedItems();
         ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
         itemListView.setAdapter(itemListAdapter);
         itemListView.setVisibility(View.VISIBLE);
         String itemList = "Here are the suggestions. ";
         for(int i = 0;i<items.size();i++){
             itemList = itemList + " " + String.valueOf(i+1)+". "+ items.get(i).getName() + " for "+ String.valueOf(items.get(i).getPrice())+" rupees from "+items.get(i).getShop().getShopName() + ". ";
+        }
+        itemList = itemList + " You can consider these suggestions also. ";
+        for(int i=0;i<Math.min(5,removedItems.size());i++){
+            itemList = itemList + " " + String.valueOf(i+1+items.size())+". "+ removedItems.get(i).getName() + " for "+ String.valueOf(removedItems.get(i).getPrice())+" rupees from "+removedItems.get(i).getShop().getShopName() + ". ";
+
         }
         success = 2;
         message = itemList+"What kind of "+items.get(0).getCategory()+" do you want? ";
