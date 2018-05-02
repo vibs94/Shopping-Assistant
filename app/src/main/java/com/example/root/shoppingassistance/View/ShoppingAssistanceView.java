@@ -43,6 +43,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     ListView itemListView;
     ListView cartListView;
     int success = 0;
+    double range;
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -95,15 +96,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 getSpeechInput();
             }
         }
-        else if(success==1){
-            if (text.length() == 0) {
-                tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
-            } else {
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                getSpeechInput();
-            }
-        }
-        else if(success==2){
+        else if(success<4){
             if (text.length() == 0) {
                 tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
             } else {
@@ -183,9 +176,12 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                         }
                     }
                     else if(success==1){
-                        addItem(result);
+                        getRange(result);
                     }
                     else if(success==2){
+                        addItem(result);
+                    }
+                    else if(success==3){
                         addMore(result);
                     }
                 }
@@ -236,8 +232,9 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 txtq.setText("success");
                 txta.setText("success");
                 print("success");
-                speakOut("success");
-                generateList();
+                success = 1;
+                message = "How much you can afford?";
+                speakOut(message);
                 valid=1;
                 break;
             }
@@ -281,6 +278,26 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         speakOut(message);
     }
 
+    private void getRange(ArrayList<String> s){
+        int selected = 0;
+        for(int i=0;i<s.size();i++) {
+            try {
+                print(s.get(i));
+                shoppingAssistanceController.setRange(Double.valueOf(s.get(i)));
+                selected = 1 ;
+                generateList();
+                break;
+            } catch (NumberFormatException e) {
+                continue;
+            }
+        }
+        if(selected==0){
+            txtq.setText("Invalid");
+            txta.setText("Invalid");
+            speakOut("Invalid! "+message);
+        }
+    }
+
     private void generateList(){
         List<Item> items = shoppingAssistanceController.getCategoryItems();
         ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
@@ -290,8 +307,9 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         for(int i = 0;i<items.size();i++){
             itemList = itemList + " " + String.valueOf(i+1)+". "+ items.get(i).getName() + " for "+ String.valueOf(items.get(i).getPrice())+" rupees from "+items.get(i).getShop().getShopName() + ". ";
         }
-        success = 1;
-        speakOut(itemList+"What kind of "+items.get(0).getCategory()+" do you want? ");
+        success = 2;
+        message = itemList+"What kind of "+items.get(0).getCategory()+" do you want? ";
+        speakOut(message);
 
     }
 
@@ -317,7 +335,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         if(selected==0){
             txtq.setText("Invalid");
             txta.setText("Invalid");
-            speakOut("Invalid!");
+            speakOut("Invalid! "+message);
         }
     }
 
@@ -326,8 +344,9 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         CartListAdapter cartListAdapter = new CartListAdapter(getApplicationContext(),items);
         cartListView.setAdapter(cartListAdapter);
         cartListView.setVisibility(View.VISIBLE);
-        success = 2;
-        speakOut("Do you want to add more items to the cart ?");
+        success = 3;
+        message = "Do you want to add more items to the cart ?";
+        speakOut(message);
     }
 
     private void addMore(ArrayList<String> s){
@@ -341,7 +360,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 success = 0;
             }
             else{
-                speakOut("Invalid!");
+                speakOut("Invalid! "+message);
             }
         }
     }

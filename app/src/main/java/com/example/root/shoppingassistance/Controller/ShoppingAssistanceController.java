@@ -21,6 +21,7 @@ public class ShoppingAssistanceController {
     List<Item> orderedItems;
     List<Item> cart = new ArrayList<Item>();
     int i;
+    double range;
 
     private static ShoppingAssistanceController shoppingAssistanceController=  null;
 
@@ -240,5 +241,13 @@ public class ShoppingAssistanceController {
 
     public void addToCart(int index){
         cart.add(orderedItems.get(index-1));
+    }
+
+    public void setRange(double range){
+        this.range = range;
+    }
+
+    public double getRange(){
+        return range;
     }
 }
