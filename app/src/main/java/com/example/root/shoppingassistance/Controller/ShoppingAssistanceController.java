@@ -20,6 +20,7 @@ public class ShoppingAssistanceController {
     List<Item> categoryItems;
     List<Item> orderedItems;
     List<Item> removedItems;
+    List<Item> randomItems;
     List<Item> cart = new ArrayList<Item>();
     int i;
     double range;
@@ -139,6 +140,25 @@ public class ShoppingAssistanceController {
 
             items.add(item5);
 
+            Item item6 = new Item();
+            item6.setCategory("mobile");
+            item6.setName("smart phone");
+            item6.setPrice(76000.00);
+            item6.setDateOfPurchace(date);
+            Shop shop6 = new Shop();
+            shop6.setShopName("Greenware");
+            shop6.setAddress("61,Liberty Plaza,Colombo 4");
+            item6.setShop(shop6);
+            attribute = new Attribute("kind ? smart phone or normal phone", "smartphone", 1);
+            item6.addAttribute(attribute);
+            attribute = new Attribute("brand", "apple", 2);
+            item6.addAttribute(attribute);
+            attribute = new Attribute("model", "iphone 6", 3);
+            item6.addAttribute(attribute);
+            item6.setNoOfPurchaces(2);
+
+            items.add(item6);
+
             print("list created");
             return items;
 
@@ -150,6 +170,7 @@ public class ShoppingAssistanceController {
     public String nextQuestion(int index,String lastResponse){
 
         String nextQ = "invalid";
+        Item removedItem;
         if (categoryItems==null||categoryItems.isEmpty()){
             print(nextQ+" con");
             return nextQ;
@@ -166,7 +187,8 @@ public class ShoppingAssistanceController {
                             for (int j = 0; j < categoryItems.size(); j++) {
                                 if (!categoryItems.get(j).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
                                     print("removed attribute "+categoryItems.get(j).getAttributes().get((index-1)).getAttributeName());
-                                    removedItems.add(0,categoryItems.remove(j));
+                                    removedItem = categoryItems.remove(j);
+                                    removedItems.add(0,removedItem);
                                     j--;
                                     i--;
                                 }
@@ -218,7 +240,9 @@ public class ShoppingAssistanceController {
         int index;
         for(int i = 0;i<scores.size();i++){
             index = scores.indexOf(Collections.max(scores));
-            orderedItems.add(categoryItems.get(index));
+            if(categoryItems.get(index).getPrice()<range){
+                orderedItems.add(categoryItems.get(index));
+            }
             scores.set(index,Double.NEGATIVE_INFINITY);
         }
 
@@ -246,7 +270,7 @@ public class ShoppingAssistanceController {
             cart.add(orderedItems.get(index - 1));
         }
         else{
-            cart.add(removedItems.get(index-orderedItems.size()-1));
+            cart.add(randomItems.get(index-orderedItems.size()-1));
         }
     }
 
@@ -258,7 +282,13 @@ public class ShoppingAssistanceController {
         return range;
     }
 
-    public List<Item> getRemovedItems(){
-        return removedItems;
+    public List<Item> getRandomItems(){
+        randomItems = new ArrayList<Item>();
+        for(int i=0;i<removedItems.size();i++){
+            if(removedItems.get(i).getPrice()<range){
+                randomItems.add(removedItems.get(i));
+            }
+        }
+        return randomItems;
     }
 }

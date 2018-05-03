@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -44,6 +43,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     ListView itemListView;
     ListView cartListView;
     int success = 0;
+    int finished = 0;
     double range;
 
     public ShoppingAssistanceView() throws ParseException {
@@ -85,27 +85,34 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     //method to speak
     private void speakOut(String text) {
-        if(success==0) {
-            txtq.setText(text);
-            if (text.length() == 0) {
+        if(finished==0) {
+            if (success == 0) {
                 txtq.setText(text);
-                tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
-            } else if (text.equals("success")) {
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-            } else {
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                getSpeechInput();
+                if (text.length() == 0) {
+                    txtq.setText(text);
+                    tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+                } else if (text.equals("success")) {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                } else {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    getSpeechInput();
+                }
+            } else if (success < 4) {
+                if (text.length() == 0) {
+                    tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+                } else {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    getSpeechInput();
+                }
             }
         }
-        else if(success<4){
+        else if(finished==1){
             if (text.length() == 0) {
                 tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
             } else {
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                getSpeechInput();
             }
         }
-
     }
 
     @Override
@@ -274,6 +281,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         isStarted = false;
         index =1;
         success = 0;
+        finished = 0;
         itemListView.setVisibility(View.GONE);
         shoppingAssistanceController = ShoppingAssistanceController.getInstance();
         speakOut(message);
@@ -300,24 +308,48 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     }
 
     private void generateList(){
+        boolean resul = false;
         List<Item> items = shoppingAssistanceController.getCategoryItems();
-        List<Item> removedItems = shoppingAssistanceController.getRemovedItems();
+        List<Item> randomItems = shoppingAssistanceController.getRandomItems();
+        String itemList;
+        if(items.size()>0) {
+            itemList = "Here are the suggestions. ";
+            for (int i = 0; i < items.size(); i++) {
+                itemList = itemList + " " + String.valueOf(i + 1) + ". " + items.get(i).getName() + " for " + String.valueOf(items.get(i).getPrice()) + " rupees from " + items.get(i).getShop().getShopName() + ". ";
+            }
+            if(randomItems.size()>0) {
+                itemList = itemList +" You can consider these suggestions also. ";
+                for (int i = 0; i < Math.min(5, randomItems.size()); i++) {
+                    itemList = itemList + " " + String.valueOf(i + 1 + items.size()) + ". " + randomItems.get(i).getName() + " for " + String.valueOf(randomItems.get(i).getPrice()) + " rupees from " + randomItems.get(i).getShop().getShopName() + ". ";
+
+                }
+            }
+            message = itemList + "What kind of " + items.get(0).getCategory() + " do you want? ";
+            success = 2;
+        }
+        else {
+            itemList = "There is no items that match to your requirement." ;
+            if(randomItems.size()>0) {
+                itemList = itemList +" But, you can consider these suggestions also. ";
+                for (int i = 0; i < Math.min(5, randomItems.size()); i++) {
+                    itemList = itemList + " " + String.valueOf(i + 1 + items.size()) + ". " + randomItems.get(i).getName() + " for " + String.valueOf(randomItems.get(i).getPrice()) + " rupees from " + randomItems.get(i).getShop().getShopName() + ". ";
+                }
+                message = itemList + "What kind of " + randomItems.get(0).getCategory() + " do you want? ";
+                success = 2;
+            }
+            else {
+                message = itemList+" Do you want to add more items to the cart ?";
+                success = 3;
+            }
+        }
+        for(int i=0;i<Math.min(5, randomItems.size());i++){
+            items.add(randomItems.get(i));
+        }
+        print("list length "+items.size()+" "+String.valueOf(resul));
         ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
         itemListView.setAdapter(itemListAdapter);
         itemListView.setVisibility(View.VISIBLE);
-        String itemList = "Here are the suggestions. ";
-        for(int i = 0;i<items.size();i++){
-            itemList = itemList + " " + String.valueOf(i+1)+". "+ items.get(i).getName() + " for "+ String.valueOf(items.get(i).getPrice())+" rupees from "+items.get(i).getShop().getShopName() + ". ";
-        }
-        itemList = itemList + " You can consider these suggestions also. ";
-        for(int i=0;i<Math.min(5,removedItems.size());i++){
-            itemList = itemList + " " + String.valueOf(i+1+items.size())+". "+ removedItems.get(i).getName() + " for "+ String.valueOf(removedItems.get(i).getPrice())+" rupees from "+removedItems.get(i).getShop().getShopName() + ". ";
-
-        }
-        success = 2;
-        message = itemList+"What kind of "+items.get(0).getCategory()+" do you want? ";
         speakOut(message);
-
     }
 
     private void addItem(ArrayList<String> s){
@@ -357,18 +389,34 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     }
 
     private void addMore(ArrayList<String> s){
+        int respond = 0;
         for(int i = 0;i<s.size();i++){
             if(s.get(i).toLowerCase().equals("yes")){
                 success = 0;
+                respond =1;
                 start();
+                break;
             }
             else if(s.get(i).toLowerCase().equals("no")){
                 itemListView.setVisibility(View.GONE);
-                success = 0;
+                finished = 1;
+                double total = 0.0;
+                message = "Here are the items in your cart. ";
+                List<Item> items = shoppingAssistanceController.getCart();
+                for(int j=0;j<items.size();j++){
+                    message = message + " " + String.valueOf(j + 1) + ". " + items.get(j).getName() + " for " + String.valueOf(items.get(j).getPrice()) + " rupees from " + items.get(j).getShop().getShopName() + ". ";
+                    total = total + items.get(j).getPrice();
+                }
+                message = message + " Total amount of the cart is "+String.valueOf(total)+" rupees.";
+                speakOut(message);
+                respond =1;
+                break;
             }
-            else{
-                speakOut("Invalid! "+message);
-            }
+        }
+        if(respond==0){
+            txtq.setText("Invalid");
+            txta.setText("Invalid");
+            speakOut("Invalid ! "+message);
         }
     }
 }
