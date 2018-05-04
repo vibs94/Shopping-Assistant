@@ -1,6 +1,5 @@
 package com.example.root.shoppingassistance.Controller;
 
-import android.util.Log;
 
 import com.example.root.shoppingassistance.Model.Attribute;
 import com.example.root.shoppingassistance.Model.Item;
@@ -27,11 +26,13 @@ public class ShoppingAssistanceController {
 
     private static ShoppingAssistanceController shoppingAssistanceController=  null;
 
+    // Singleton
     private ShoppingAssistanceController() throws ParseException {
         getItems();
         categoryItems = new ArrayList<Item>();
     }
 
+    // Get an instance of ShoppingAssistanceController
     public static ShoppingAssistanceController getInstance(){
         if(shoppingAssistanceController==null){
             try {
@@ -43,8 +44,8 @@ public class ShoppingAssistanceController {
         return shoppingAssistanceController;
     }
 
+    // Return the list of all the items
     public List<Item> getItems() throws ParseException {
-
 
             Item item1 = new Item();
             item1.setCategory("shirt");
@@ -159,34 +160,27 @@ public class ShoppingAssistanceController {
 
             items.add(item6);
 
-            print("list created");
             return items;
 
 
     }
 
-
-
+    // Get the next question for the given response
     public String nextQuestion(int index,String lastResponse){
 
         String nextQ = "invalid";
         Item removedItem;
         if (categoryItems==null||categoryItems.isEmpty()){
-            print(nextQ+" con");
             return nextQ;
         }
         else{
             if(categoryItems.size()>0) {
-                print("index "+String.valueOf(index));
-                print("last response: "+lastResponse);
                 for (i = 0; i < categoryItems.size(); i++) {
                     if (categoryItems.get(i).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
                         if (index < categoryItems.get(i).getAttributes().size()) {
-                            print("att type return "+categoryItems.get(0).getAttributes().get(index).getAttributeType());
                             nextQ = categoryItems.get(i).getAttributes().get(index).getAttributeType();
                             for (int j = 0; j < categoryItems.size(); j++) {
                                 if (!categoryItems.get(j).getAttributes().get((index-1)).getAttributeName().equals(lastResponse)) {
-                                    print("removed attribute "+categoryItems.get(j).getAttributes().get((index-1)).getAttributeName());
                                     removedItem = categoryItems.remove(j);
                                     removedItems.add(0,removedItem);
                                     j--;
@@ -195,27 +189,22 @@ public class ShoppingAssistanceController {
                             }
                             return nextQ;
                         } else {
-                            print(String.valueOf(categoryItems.size()) + " con");
                             return "success";
                         }
                     }
                 }
 
             }
-            print(nextQ + " con");
             return nextQ;
         }
     }
 
+    // Get the first question for the given category
     public String getFirstQ(){
-        print(String.valueOf(categoryItems.size()));
         return categoryItems.get(0).getAttributes().get(0).getAttributeType();
     }
 
-    private void print(String s){
-        Log.e("message",s);
-    }
-
+    // Get the list of items for given category
     public List<Item> getItemsOfCategory(String s) {
         categoryItems = new ArrayList<Item>();
         removedItems = new ArrayList<Item>();
@@ -228,6 +217,7 @@ public class ShoppingAssistanceController {
         return categoryItems;
     }
 
+    // Get the suggestions based on the responses
     public List<Item> getCategoryItems() {
 
         orderedItems =  new ArrayList<Item>();
@@ -240,7 +230,7 @@ public class ShoppingAssistanceController {
         int index;
         for(int i = 0;i<scores.size();i++){
             index = scores.indexOf(Collections.max(scores));
-            if(categoryItems.get(index).getPrice()<range){
+            if(categoryItems.get(index).getPrice()<=range){
                 orderedItems.add(categoryItems.get(index));
             }
             scores.set(index,Double.NEGATIVE_INFINITY);
@@ -249,22 +239,23 @@ public class ShoppingAssistanceController {
         return orderedItems;
     }
 
+    // Get the priority score for a given item
     private double getItemScore(Item item){
 
         double score;
         double currentDate = (double) (new Date().getTime()-(item.getDateOfPurchace().getTime()))/Math.pow(10.0,7.0);
 
-        print("currentDate " + String.valueOf(currentDate));
-
         score = currentDate*item.getNoOfPurchaces()/item.getPrice();
-        print(String.valueOf(item.getPrice())+" score "+String.valueOf(score));
+
         return score;
     }
 
+    // Get the items in the cart
     public List<Item> getCart(){
         return cart;
     }
 
+    // Add an item to the cart
     public void addToCart(int index){
         if(index<=orderedItems.size()) {
             cart.add(orderedItems.get(index - 1));
@@ -274,18 +265,16 @@ public class ShoppingAssistanceController {
         }
     }
 
+    // Set the range for a given item
     public void setRange(double range){
         this.range = range;
     }
 
-    public double getRange(){
-        return range;
-    }
-
+    // Generate random list of items
     public List<Item> getRandomItems(){
         randomItems = new ArrayList<Item>();
         for(int i=0;i<removedItems.size();i++){
-            if(removedItems.get(i).getPrice()<range){
+            if(removedItems.get(i).getPrice()<=range){
                 randomItems.add(removedItems.get(i));
             }
         }

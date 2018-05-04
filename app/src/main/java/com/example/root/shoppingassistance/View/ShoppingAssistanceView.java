@@ -170,7 +170,6 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     Toast.makeText(getApplicationContext(), result.get(0),
                             Toast.LENGTH_LONG).show();
 
-                    print(result.get(0));
                     if(success==0){
                         try {
                             if(isStarted) {
@@ -197,17 +196,16 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         }
     }
 
+    // Method to start the chat
     public void startChat(ArrayList<String> s) throws ParseException {
 
         int valid = 0;
         int categorySize;
         for(int i=0;i<s.size();i++){
-            print("result "+String.valueOf(i)+" "+s.get(i));
             categorySize = shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size();
             if(categorySize>0){
                 isStarted = true;
                 txta.setText(s.get(i));
-                print("started "+String.valueOf(categorySize));
                 message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
                 speakOut(message);
                 valid=1;
@@ -220,18 +218,17 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
             speakOut(errorMessage+" "+message);
-            print(errorMessage);
             txta.setText(errorMessage);
         }
 
     }
 
+    // Method to continue the chat
     public void continueChat(ArrayList<String> s) throws ParseException {
 
         String response;
         int valid = 0;
         for(int i=0;i<s.size();i++){
-            print("result "+String.valueOf(i)+" "+s.get(i));
             response = shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase());
             if(response.equals("invalid")) {
                 continue;
@@ -239,7 +236,6 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             else if(response.equals("success")){
                 txtq.setText("success");
                 txta.setText("success");
-                print("success");
                 success = 1;
                 message = "How much you can afford?";
                 speakOut(message);
@@ -249,7 +245,6 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             else{
                 message = "what is "+response+" ?";
                 txta.setText(s.get(i));
-                print(message);
                 index++;
                 speakOut(message);
                 Toast.makeText(getApplicationContext(), s.get(i),
@@ -263,17 +258,13 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
             speakOut(errorMessage+ " "+message);
-            print(errorMessage);
             txta.setText(errorMessage);
         }
 
 
     }
 
-    private void print(String s){
-        Log.e("message",s);
-    }
-
+    // Method to initiate the conversation
     private void start(){
         txtq.setText("");
         txta.setText("");
@@ -287,11 +278,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         speakOut(message);
     }
 
+    // Method to get the price range of the item
     private void getRange(ArrayList<String> s){
         int selected = 0;
         for(int i=0;i<s.size();i++) {
             try {
-                print(s.get(i));
                 shoppingAssistanceController.setRange(Double.valueOf(s.get(i)));
                 selected = 1 ;
                 generateList();
@@ -307,8 +298,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         }
     }
 
+    // Method to generate the suggestions list
     private void generateList(){
-        boolean resul = false;
         List<Item> items = shoppingAssistanceController.getCategoryItems();
         List<Item> randomItems = shoppingAssistanceController.getRandomItems();
         String itemList;
@@ -345,29 +336,25 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         for(int i=0;i<Math.min(5, randomItems.size());i++){
             items.add(randomItems.get(i));
         }
-        print("list length "+items.size()+" "+String.valueOf(resul));
         ItemListAdapter itemListAdapter = new ItemListAdapter(getApplicationContext(),items);
         itemListView.setAdapter(itemListAdapter);
         itemListView.setVisibility(View.VISIBLE);
         speakOut(message);
     }
 
+    // Method to add items to the cart
     private void addItem(ArrayList<String> s){
         int selected = 0;
-        print("Succ "+String.valueOf(success));
         for(int i=0;i<s.size();i++) {
             try {
-                print(s.get(i));
                 int selectedItem = Integer.parseInt(s.get(i));
                 shoppingAssistanceController.addToCart(selectedItem);
                 selected = 1;
-                print("selected");
                 txtq.setText("Selected");
                 txta.setText("Selected");
                 generateCart();
                 break;
             } catch (NumberFormatException e) {
-                print("cont");
                 continue;
             }
         }
@@ -378,6 +365,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         }
     }
 
+    // Method to generate the cart
     private void generateCart(){
         List<Item> items = shoppingAssistanceController.getCart();
         CartListAdapter cartListAdapter = new CartListAdapter(getApplicationContext(),items);
@@ -388,6 +376,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         speakOut(message);
     }
 
+    // Method to get the response to add more items
     private void addMore(ArrayList<String> s){
         int respond = 0;
         for(int i = 0;i<s.size();i++){
