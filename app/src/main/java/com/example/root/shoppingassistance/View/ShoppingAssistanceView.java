@@ -32,8 +32,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private TextToSpeech tts;
     private Button btnStart;
     private Button btnSpeak;
-    private EditText txtq;
-    private EditText txta;
+    private EditText txtAns;
+    private EditText txtQue;
     String errorMessage = "Invalid request !";
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ShoppingAssistanceController shoppingAssistanceController = ShoppingAssistanceController.getInstance();
@@ -44,7 +44,6 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     ListView cartListView;
     int success = 0;
     int finished = 0;
-    double range;
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -57,8 +56,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
         tts = new TextToSpeech(this, this);
 
-        txtq = (EditText) findViewById(R.id.txtQ);
-        txta = (EditText) findViewById(R.id.txtA);
+        txtAns = (EditText) findViewById(R.id.txtQ);
+        txtQue = (EditText) findViewById(R.id.txtA);
 
         // Refer 'Speak' button
         btnStart = (Button) findViewById(R.id.btnSpeak);
@@ -67,6 +66,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         itemListView.setVisibility(View.GONE);
         cartListView = (ListView) findViewById(R.id.list_cart);
         cartListView.setVisibility(View.GONE);
+
         // Handle onClick event for button 'Speak'
         btnStart.setOnClickListener(new View.OnClickListener() {
 
@@ -83,13 +83,17 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         });
     }
 
+
+
+
+
     //method to speak
     private void speakOut(String text) {
         if(finished==0) {
             if (success == 0) {
-                txtq.setText(text);
+                txtAns.setText(text);
                 if (text.length() == 0) {
-                    txtq.setText(text);
+                    txtAns.setText(text);
                     tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
                 } else if (text.equals("success")) {
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
@@ -137,7 +141,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         } else {
             Toast.makeText(this, "TTS Initilization Failed", Toast.LENGTH_LONG)
                     .show();
-            Log.e("TTS", "Initilization Failed");
+            Log.e("TTS", "Initialization Failed");
         }
     }
 
@@ -205,7 +209,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             categorySize = shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size();
             if(categorySize>0){
                 isStarted = true;
-                txta.setText(s.get(i));
+                txtQue.setText(s.get(i));
                 message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
                 speakOut(message);
                 valid=1;
@@ -218,7 +222,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
             speakOut(errorMessage+" "+message);
-            txta.setText(errorMessage);
+            txtQue.setText(errorMessage);
         }
 
     }
@@ -234,8 +238,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 continue;
             }
             else if(response.equals("success")){
-                txtq.setText("success");
-                txta.setText("success");
+                txtAns.setText("success");
+                txtQue.setText("success");
                 success = 1;
                 message = "How much you can afford?";
                 speakOut(message);
@@ -244,7 +248,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
             else{
                 message = "what is "+response+" ?";
-                txta.setText(s.get(i));
+                txtQue.setText(s.get(i));
                 index++;
                 speakOut(message);
                 Toast.makeText(getApplicationContext(), s.get(i),
@@ -258,7 +262,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             Toast.makeText(getApplicationContext(), errorMessage,
                     Toast.LENGTH_LONG).show();
             speakOut(errorMessage+ " "+message);
-            txta.setText(errorMessage);
+            txtQue.setText(errorMessage);
         }
 
 
@@ -266,8 +270,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     // Method to initiate the conversation
     private void start(){
-        txtq.setText("");
-        txta.setText("");
+        txtAns.setText("");
+        txtQue.setText("");
         message = "What are you looking for ?";
         isStarted = false;
         index =1;
@@ -292,8 +296,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
         }
         if(selected==0){
-            txtq.setText("Invalid");
-            txta.setText("Invalid");
+            txtAns.setText("Invalid");
+            txtQue.setText("Invalid");
             speakOut("Invalid! "+message);
         }
     }
@@ -350,8 +354,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 int selectedItem = Integer.parseInt(s.get(i));
                 shoppingAssistanceController.addToCart(selectedItem);
                 selected = 1;
-                txtq.setText("Selected");
-                txta.setText("Selected");
+                txtAns.setText("Selected");
+                txtQue.setText("Selected");
                 generateCart();
                 break;
             } catch (NumberFormatException e) {
@@ -359,8 +363,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
         }
         if(selected==0){
-            txtq.setText("Invalid");
-            txta.setText("Invalid");
+            txtAns.setText("Invalid");
+            txtQue.setText("Invalid");
             speakOut("Invalid! "+message);
         }
     }
@@ -403,9 +407,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
         }
         if(respond==0){
-            txtq.setText("Invalid");
-            txta.setText("Invalid");
+            txtAns.setText("Invalid");
+            txtQue.setText("Invalid");
             speakOut("Invalid ! "+message);
         }
     }
+
+
 }
