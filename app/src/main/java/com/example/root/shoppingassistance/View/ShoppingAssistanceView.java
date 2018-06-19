@@ -71,7 +71,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         btnStart.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View arg0) {
-                start();
+                initiate();
             }
 
         });
@@ -90,7 +90,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     //method to speak
     private void speakOut(String text) {
         if(finished==0) {
-            if (success == 0) {
+            if (success == 0||success == 10) {
                 txtAns.setText(text);
                 if (text.length() == 0) {
                     txtAns.setText(text);
@@ -101,7 +101,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
                     getSpeechInput();
                 }
-            } else if (success < 4) {
+            } else if (success < 6) {
                 if (text.length() == 0) {
                     tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
                 } else {
@@ -174,7 +174,10 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     Toast.makeText(getApplicationContext(), result.get(0),
                             Toast.LENGTH_LONG).show();
 
-                    if(success==0){
+                    if(success==10){
+                        getListOrItem(result);
+                    }
+                    else if(success==0){
                         try {
                             if(isStarted) {
                                 continueChat(result);
@@ -195,8 +198,89 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     else if(success==3){
                         addMore(result);
                     }
+                    else if(success==4){
+                        addItemToList(result);
+                    }
+                    else if(success==5){
+                        addMoreToList(result);
+                    }
                 }
                 break;
+        }
+    }
+
+    private void addMoreToList(ArrayList<String> s) {
+        int respond = 0;
+        for(int i = 0;i<s.size();i++){
+            if(s.get(i).toLowerCase().equals("yes")){
+                success = 4;
+                message = "Add your next item. ";
+                speakOut(message);
+                break;
+            }
+            else if(s.get(i).toLowerCase().equals("no")){
+                itemListView.setVisibility(View.GONE);
+                finished = 1;
+                double total = 0.0;
+                message = "Here are the items in your cart. ";
+                List<Item> items = shoppingAssistanceController.getCart();
+                for(int j=0;j<items.size();j++){
+                    message = message + " " + String.valueOf(j + 1) + ". " + items.get(j).getName() + " for " + String.valueOf(items.get(j).getPrice()) + " rupees from " + items.get(j).getShop().getShopName() + ". ";
+                    total = total + items.get(j).getPrice();
+                }
+                message = message + " Total amount of the cart is "+String.valueOf(total)+" rupees.";
+                speakOut(message);
+                respond =1;
+                break;
+            }
+        }
+        if(respond==0){
+            txtAns.setText("Invalid");
+            txtQue.setText("Invalid");
+            speakOut("Invalid ! "+message);
+        }
+    }
+
+    private void addItemToList(ArrayList<String> s) {
+        int selected = 0;
+        for(int i=0;i<s.size();i++) {
+            if(shoppingAssistanceController.addToCart(s.get(i))) {
+                generateCart();
+                break;
+            }
+        }
+        if(selected==0){
+            txtAns.setText("Invalid");
+            txtQue.setText("Invalid");
+            speakOut("Invalid! "+message);
+        }
+    }
+
+    private void getListOrItem(ArrayList<String> s) {
+        int respond = 0;
+        for(int i = 0;i<s.size();i++){
+            if(s.get(i).toLowerCase().equals("item")){
+                success = 0;
+                respond =1;
+                start();
+                break;
+            }
+            else if(s.get(i).toLowerCase().equals("list")){
+                itemListView.setVisibility(View.GONE);
+                txtAns.setText("");
+                txtQue.setText("");
+                success = 4;
+                message = "You have to add one item at a time. Add first item. ";
+                shoppingAssistanceController = ShoppingAssistanceController.getInstance();
+                speakOut(message);
+                respond =1;
+                break;
+            }
+        }
+        if(respond==0){
+            txtAns.setText("Invalid");
+            txtQue.setText("Invalid");
+            speakOut("Invalid ! "+message);
         }
     }
 
@@ -375,9 +459,16 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         CartListAdapter cartListAdapter = new CartListAdapter(getApplicationContext(),items);
         cartListView.setAdapter(cartListAdapter);
         cartListView.setVisibility(View.VISIBLE);
-        success = 3;
-        message = "Do you want to add more items to the cart ?";
-        speakOut(message);
+        if(success==2){
+            success = 3;
+            message = "Do you want to add more items to the cart ?";
+            speakOut(message);
+        }
+        else if(success==4){
+            success = 5;
+            message = "Do you want to add more items to the list ?";
+            speakOut(message);
+        }
     }
 
     // Method to get the response to add more items
@@ -411,6 +502,19 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             txtQue.setText("Invalid");
             speakOut("Invalid ! "+message);
         }
+    }
+
+    private void initiate(){
+        txtAns.setText("");
+        txtQue.setText("");
+        message = "Do you want to add a item or a list ?";
+        isStarted = false;
+        index =1;
+        success = 10;
+        finished = 0;
+        itemListView.setVisibility(View.GONE);
+        shoppingAssistanceController = ShoppingAssistanceController.getInstance();
+        speakOut(message);
     }
 
 

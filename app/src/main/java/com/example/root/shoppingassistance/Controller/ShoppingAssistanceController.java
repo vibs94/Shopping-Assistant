@@ -280,4 +280,24 @@ public class ShoppingAssistanceController {
         }
         return randomItems;
     }
+
+    private Item getItem(String itemName){
+        for(int i=0;i<items.size();i++){
+            if(items.get(i).getName().equals(itemName)){
+                return items.get(i);
+            }
+        }
+        return null;
+    }
+
+    public boolean addToCart(String itemName){
+        Item item = getItem(itemName);
+        if (item!=null){
+            cart.add(item);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
