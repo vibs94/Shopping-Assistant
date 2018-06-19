@@ -20,7 +20,7 @@ public class ShoppingAssistanceController {
     List<Item> orderedItems;
     List<Item> removedItems;
     List<Item> randomItems;
-    List<Item> cart = new ArrayList<Item>();
+    List<Item> cart;
     int i;
     double range;
 
@@ -30,6 +30,7 @@ public class ShoppingAssistanceController {
     private ShoppingAssistanceController() throws ParseException {
         getItems();
         categoryItems = new ArrayList<Item>();
+        cart  = new ArrayList<Item>();
     }
 
     // Get an instance of ShoppingAssistanceController
@@ -44,12 +45,18 @@ public class ShoppingAssistanceController {
         return shoppingAssistanceController;
     }
 
+    public void init() throws ParseException {
+        getItems();
+        categoryItems = new ArrayList<Item>();
+        cart  = new ArrayList<Item>();
+    }
+
     // Return the list of all the items
     public List<Item> getItems() throws ParseException {
 
             Item item1 = new Item();
             item1.setCategory("shirt");
-            item1.setName("formal");
+            item1.setName("formal shirt");
             item1.setPrice(3000);
             String sDate = "2018-01-31";
             Date date = new SimpleDateFormat("yyyy-mm-dd").parse(sDate);
@@ -69,7 +76,7 @@ public class ShoppingAssistanceController {
 
             Item item2 = new Item();
             item2.setCategory("shirt");
-            item2.setName("casual");
+            item2.setName("casual shirt");
             item2.setPrice(3000);
             item2.setDateOfPurchace(date);
             Shop shop2 = new Shop();

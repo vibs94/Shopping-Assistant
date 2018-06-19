@@ -71,7 +71,11 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         btnStart.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View arg0) {
-                initiate();
+                try {
+                    initiate();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
 
         });
@@ -216,6 +220,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 success = 4;
                 message = "Add your next item. ";
                 speakOut(message);
+                respond =1;
                 break;
             }
             else if(s.get(i).toLowerCase().equals("no")){
@@ -244,8 +249,10 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private void addItemToList(ArrayList<String> s) {
         int selected = 0;
         for(int i=0;i<s.size();i++) {
+            Log.e(s.get(i),s.get(i));
             if(shoppingAssistanceController.addToCart(s.get(i))) {
                 generateCart();
+                selected =1;
                 break;
             }
         }
@@ -504,7 +511,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         }
     }
 
-    private void initiate(){
+    private void initiate() throws ParseException {
         txtAns.setText("");
         txtQue.setText("");
         message = "Do you want to add a item or a list ?";
@@ -513,7 +520,9 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         success = 10;
         finished = 0;
         itemListView.setVisibility(View.GONE);
+        cartListView.setVisibility(View.GONE);
         shoppingAssistanceController = ShoppingAssistanceController.getInstance();
+        shoppingAssistanceController.init();
         speakOut(message);
     }
 
