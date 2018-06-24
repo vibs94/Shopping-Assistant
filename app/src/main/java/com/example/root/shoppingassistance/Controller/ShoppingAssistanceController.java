@@ -53,7 +53,7 @@ public class ShoppingAssistanceController {
 
     // Return the list of all the items
     public List<Item> getItems() throws ParseException {
-
+            items = new ArrayList<Item>();
             Item item1 = new Item();
             item1.setCategory("shirt");
             item1.setName("formal shirt");
@@ -93,7 +93,7 @@ public class ShoppingAssistanceController {
 
             Item item3 = new Item();
             item3.setCategory("mobile");
-            item3.setName("smart phone");
+            item3.setName("smartphone");
             item3.setPrice(74000.00);
             item3.setDateOfPurchace(date);
             Shop shop3 = new Shop();
@@ -112,7 +112,7 @@ public class ShoppingAssistanceController {
 
             Item item4 = new Item();
             item4.setCategory("mobile");
-            item4.setName("smart phone");
+            item4.setName("smartphone");
             item4.setPrice(73000.00);
             item4.setDateOfPurchace(date);
             Shop shop4 = new Shop();
@@ -131,7 +131,7 @@ public class ShoppingAssistanceController {
 
             Item item5 = new Item();
             item5.setCategory("mobile");
-            item5.setName("samsung smart phone");
+            item5.setName("samsung smartphone");
             item5.setPrice(3000);
             item5.setDateOfPurchace(date);
             Shop shop5 = new Shop();
@@ -150,7 +150,7 @@ public class ShoppingAssistanceController {
 
             Item item6 = new Item();
             item6.setCategory("mobile");
-            item6.setName("smart phone");
+            item6.setName("smartphone");
             item6.setPrice(76000.00);
             item6.setDateOfPurchace(date);
             Shop shop6 = new Shop();
@@ -166,6 +166,21 @@ public class ShoppingAssistanceController {
             item6.setNoOfPurchaces(2);
 
             items.add(item6);
+
+            Item item7 = new Item();
+            item7.setCategory("soap");
+            item7.setName("sunlight soap");
+            item7.setPrice(50.00);
+            item7.setDateOfPurchace(date);
+            Shop shop7 = new Shop();
+            shop7.setShopName("Food city");
+            shop7.setAddress("61,Union Place,Colombo 4");
+            item7.setShop(shop7);
+            attribute = new Attribute("brand", "sunlight", 1);
+            item7.addAttribute(attribute);
+            item7.setNoOfPurchaces(2);
+
+            items.add(item7);
 
             return items;
 

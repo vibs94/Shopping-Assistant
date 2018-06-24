@@ -44,6 +44,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     ListView cartListView;
     int success = 0;
     int finished = 0;
+    int invaliedAttemps = 0;
 
     public ShoppingAssistanceView() throws ParseException {
         dbCon=DatabaseConnector.getInstance(this);
@@ -93,32 +94,44 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
     //method to speak
     private void speakOut(String text) {
-        if(finished==0) {
-            if (success == 0||success == 10) {
-                txtAns.setText(text);
-                if (text.length() == 0) {
-                    txtAns.setText(text);
-                    tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
-                } else if (text.equals("success")) {
-                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                } else {
-                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                    getSpeechInput();
-                }
-            } else if (success < 6) {
-                if (text.length() == 0) {
-                    tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
-                } else {
-                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-                    getSpeechInput();
-                }
-            }
+        if(text.equals("stop")){
+            txtAns.setText("");
+            txtQue.setText("");
+            tts.speak("Process will be terminated.", TextToSpeech.QUEUE_FLUSH, null);
+            itemListView.setVisibility(View.GONE);
+            cartListView.setVisibility(View.GONE);
+
         }
-        else if(finished==1){
-            if (text.length() == 0) {
-                tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
-            } else {
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        else {
+            if (finished == 0) {
+                if (success == 0 || success == 10) {
+                    txtAns.setText(text);
+                    txtQue.setText("");
+                    if (text.length() == 0) {
+                        txtAns.setText(text);
+                        tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+                    } else if (text.equals("success")) {
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    } else {
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        getSpeechInput();
+                    }
+                } else if (success < 6) {
+                    txtAns.setText(text);
+                    txtQue.setText("");
+                    if (text.length() == 0) {
+                        tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+                    } else {
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                        getSpeechInput();
+                    }
+                }
+            } else if (finished == 1) {
+                if (text.length() == 0) {
+                    tts.speak("You haven't typed text", TextToSpeech.QUEUE_FLUSH, null);
+                } else {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                }
             }
         }
     }
@@ -178,39 +191,55 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                     Toast.makeText(getApplicationContext(), result.get(0),
                             Toast.LENGTH_LONG).show();
 
-                    if(success==10){
-                        getListOrItem(result);
+                    if(isStoped(result)){
+                        Log.e("Check stop","Check stop");
+                        speakOut("stop");
                     }
-                    else if(success==0){
-                        try {
-                            if(isStarted) {
-                                continueChat(result);
+                    else {
+                        if (success == 10) {
+                            try {
+                                getListOrItem(result);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
-                            else {
-                                startChat(result);
+                        } else if (success == 0) {
+                            try {
+                                if (isStarted) {
+                                    continueChat(result);
+                                } else {
+                                    startChat(result);
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                        } else if (success == 1) {
+                            getRange(result);
+                        } else if (success == 2) {
+                            addItem(result);
+                        } else if (success == 3) {
+                            try {
+                                addMore(result);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        } else if (success == 4) {
+                            addItemToList(result);
+                        } else if (success == 5) {
+                            addMoreToList(result);
                         }
-                    }
-                    else if(success==1){
-                        getRange(result);
-                    }
-                    else if(success==2){
-                        addItem(result);
-                    }
-                    else if(success==3){
-                        addMore(result);
-                    }
-                    else if(success==4){
-                        addItemToList(result);
-                    }
-                    else if(success==5){
-                        addMoreToList(result);
                     }
                 }
                 break;
         }
+    }
+
+    private boolean isStoped(ArrayList<String> s) {
+        for(int i = 0;i<s.size();i++) {
+            if (s.get(i).toLowerCase().equals("stop")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void addMoreToList(ArrayList<String> s) {
@@ -221,6 +250,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 message = "Add your next item. ";
                 speakOut(message);
                 respond =1;
+                invaliedAttemps = 0;
                 break;
             }
             else if(s.get(i).toLowerCase().equals("no")){
@@ -230,19 +260,30 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 message = "Here are the items in your cart. ";
                 List<Item> items = shoppingAssistanceController.getCart();
                 for(int j=0;j<items.size();j++){
-                    message = message + " " + String.valueOf(j + 1) + ". " + items.get(j).getName() + " for " + String.valueOf(items.get(j).getPrice()) + " rupees from " + items.get(j).getShop().getShopName() + ". ";
+                    message = message + " " + String.valueOf(j + 1) + ". " + items.get(j).getName() + " for "
+                            + String.valueOf(items.get(j).getPrice()) + " rupees from " + items.get(j).getShop().getShopName() + ". ";
                     total = total + items.get(j).getPrice();
                 }
                 message = message + " Total amount of the cart is "+String.valueOf(total)+" rupees.";
                 speakOut(message);
                 respond =1;
+                invaliedAttemps = 0;
+                txtQue.setText("");
+                txtAns.setText("");
                 break;
             }
         }
         if(respond==0){
-            txtAns.setText("Invalid");
-            txtQue.setText("Invalid");
-            speakOut("Invalid ! "+message);
+            if(invaliedAttemps<3) {
+                txtAns.setText("Invalid");
+                txtQue.setText("Invalid");
+                invaliedAttemps++;
+                speakOut("Invalid ! " + message);
+            }
+            else{
+                invaliedAttemps = 0;
+                speakOut("Give your input clearly ! " + message);
+            }
         }
     }
 
@@ -253,23 +294,32 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             if(shoppingAssistanceController.addToCart(s.get(i))) {
                 generateCart();
                 selected =1;
+                invaliedAttemps = 0;
                 break;
             }
         }
         if(selected==0){
-            txtAns.setText("Invalid");
-            txtQue.setText("Invalid");
-            speakOut("Invalid! "+message);
+            if(invaliedAttemps<3) {
+                txtAns.setText("Invalid");
+                txtQue.setText("Invalid");
+                invaliedAttemps++;
+                speakOut("Invalid! " + message);
+            }
+            else{
+                invaliedAttemps = 0;
+                speakOut("Give your input clearly ! " + message);
+            }
         }
     }
 
-    private void getListOrItem(ArrayList<String> s) {
+    private void getListOrItem(ArrayList<String> s) throws ParseException {
         int respond = 0;
         for(int i = 0;i<s.size();i++){
             if(s.get(i).toLowerCase().equals("item")){
                 success = 0;
                 respond =1;
                 start();
+                invaliedAttemps = 0;
                 break;
             }
             else if(s.get(i).toLowerCase().equals("list")){
@@ -279,15 +329,24 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 success = 4;
                 message = "You have to add one item at a time. Add first item. ";
                 shoppingAssistanceController = ShoppingAssistanceController.getInstance();
+                shoppingAssistanceController.init();
                 speakOut(message);
                 respond =1;
+                invaliedAttemps = 0;
                 break;
             }
         }
         if(respond==0){
-            txtAns.setText("Invalid");
-            txtQue.setText("Invalid");
-            speakOut("Invalid ! "+message);
+            if(invaliedAttemps<3) {
+                txtAns.setText("Invalid");
+                txtQue.setText("Invalid");
+                invaliedAttemps++;
+                speakOut("Invalid ! " + message);
+            }
+            else{
+                invaliedAttemps = 0;
+                speakOut("Give your input clearly ! " + message);
+            }
         }
     }
 
@@ -297,6 +356,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         int valid = 0;
         int categorySize;
         for(int i=0;i<s.size();i++){
+            Log.e(s.get(i),s.get(i));
             categorySize = shoppingAssistanceController.getItemsOfCategory(s.get(i).toLowerCase()).size();
             if(categorySize>0){
                 isStarted = true;
@@ -304,16 +364,24 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 message = "what is the "+shoppingAssistanceController.getFirstQ()+" ?";
                 speakOut(message);
                 valid=1;
+                invaliedAttemps = 0;
                 break;
             }
 
         }
 
         if(valid==0){
-            Toast.makeText(getApplicationContext(), errorMessage,
-                    Toast.LENGTH_LONG).show();
-            speakOut(errorMessage+" "+message);
-            txtQue.setText(errorMessage);
+            if(invaliedAttemps<3) {
+                Toast.makeText(getApplicationContext(), errorMessage,
+                        Toast.LENGTH_LONG).show();
+                invaliedAttemps++;
+                speakOut(errorMessage + " " + message);
+                txtQue.setText(errorMessage);
+            }
+            else{
+                invaliedAttemps = 0;
+                speakOut("Item you looking for might not be in the history or your input is not clear!" + " " + message);
+            }
         }
 
     }
@@ -324,6 +392,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         String response;
         int valid = 0;
         for(int i=0;i<s.size();i++){
+            Log.e(s.get(i),s.get(i));
             response = shoppingAssistanceController.nextQuestion(index,s.get(i).toLowerCase());
             if(response.equals("invalid")) {
                 continue;
@@ -335,6 +404,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 message = "How much you can afford?";
                 speakOut(message);
                 valid=1;
+                invaliedAttemps =0;
                 break;
             }
             else{
@@ -345,22 +415,30 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 Toast.makeText(getApplicationContext(), s.get(i),
                         Toast.LENGTH_LONG).show();
                 valid=1;
+                invaliedAttemps = 0;
                 break;
             }
         }
 
         if(valid==0){
-            Toast.makeText(getApplicationContext(), errorMessage,
-                    Toast.LENGTH_LONG).show();
-            speakOut(errorMessage+ " "+message);
-            txtQue.setText(errorMessage);
+            if(invaliedAttemps<3) {
+                Toast.makeText(getApplicationContext(), errorMessage,
+                        Toast.LENGTH_LONG).show();
+                invaliedAttemps++;
+                speakOut(errorMessage + " " + message);
+                txtQue.setText(errorMessage);
+            }
+            else{
+                invaliedAttemps = 0;
+                speakOut("Item you looking for might not be in the history or your input is not clear!" + " " + message);
+            }
         }
 
 
     }
 
     // Method to initiate the conversation
-    private void start(){
+    private void start() throws ParseException {
         txtAns.setText("");
         txtQue.setText("");
         message = "What are you looking for ?";
@@ -368,8 +446,10 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         index =1;
         success = 0;
         finished = 0;
+        invaliedAttemps = 0;
         itemListView.setVisibility(View.GONE);
         shoppingAssistanceController = ShoppingAssistanceController.getInstance();
+        shoppingAssistanceController.init();
         speakOut(message);
     }
 
@@ -380,6 +460,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             try {
                 shoppingAssistanceController.setRange(Double.valueOf(s.get(i)));
                 selected = 1 ;
+                invaliedAttemps = 0;
                 generateList();
                 break;
             } catch (NumberFormatException e) {
@@ -387,26 +468,39 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
         }
         if(selected==0){
-            txtAns.setText("Invalid");
-            txtQue.setText("Invalid");
-            speakOut("Invalid! "+message);
+            if(invaliedAttemps<3){
+                txtAns.setText("Invalid");
+                txtQue.setText("Invalid");
+                invaliedAttemps++;
+                speakOut("Invalid! "+message);
+            }
+            else {
+                invaliedAttemps = 0;
+                speakOut("Give your input clearly ! " + message);
+            }
         }
     }
 
     // Method to generate the suggestions list
     private void generateList(){
         List<Item> items = shoppingAssistanceController.getCategoryItems();
+        Log.e("item list size",String.valueOf(items.size()));
         List<Item> randomItems = shoppingAssistanceController.getRandomItems();
+        Log.e("suggession list",String.valueOf(randomItems.size()));
         String itemList;
         if(items.size()>0) {
             itemList = "Here are the suggestions. ";
             for (int i = 0; i < items.size(); i++) {
-                itemList = itemList + " " + String.valueOf(i + 1) + ". " + items.get(i).getName() + " for " + String.valueOf(items.get(i).getPrice()) + " rupees from " + items.get(i).getShop().getShopName() + ". ";
+                itemList = itemList + " " + String.valueOf(i + 1) + ". " + items.get(i).getName() +
+                        " for " + String.valueOf(items.get(i).getPrice()) + " rupees from " +
+                        items.get(i).getShop().getShopName() + ". ";
             }
             if(randomItems.size()>0) {
                 itemList = itemList +" You can consider these suggestions also. ";
                 for (int i = 0; i < Math.min(5, randomItems.size()); i++) {
-                    itemList = itemList + " " + String.valueOf(i + 1 + items.size()) + ". " + randomItems.get(i).getName() + " for " + String.valueOf(randomItems.get(i).getPrice()) + " rupees from " + randomItems.get(i).getShop().getShopName() + ". ";
+                    itemList = itemList + " " + String.valueOf(i + 1 + items.size()) + ". " +
+                            randomItems.get(i).getName() + " for " + String.valueOf(randomItems.get(i).getPrice()) +
+                            " rupees from " + randomItems.get(i).getShop().getShopName() + ". ";
 
                 }
             }
@@ -418,7 +512,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             if(randomItems.size()>0) {
                 itemList = itemList +" But, you can consider these suggestions also. ";
                 for (int i = 0; i < Math.min(5, randomItems.size()); i++) {
-                    itemList = itemList + " " + String.valueOf(i + 1 + items.size()) + ". " + randomItems.get(i).getName() + " for " + String.valueOf(randomItems.get(i).getPrice()) + " rupees from " + randomItems.get(i).getShop().getShopName() + ". ";
+                    itemList = itemList + " " + String.valueOf(i + 1 + items.size()) + ". " + randomItems.get(i).getName() +
+                            " for " + String.valueOf(randomItems.get(i).getPrice()) + " rupees from " + randomItems.get(i).getShop().getShopName() + ". ";
                 }
                 message = itemList + "What kind of " + randomItems.get(0).getCategory() + " do you want? ";
                 success = 2;
@@ -447,6 +542,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 selected = 1;
                 txtAns.setText("Selected");
                 txtQue.setText("Selected");
+                invaliedAttemps = 0;
                 generateCart();
                 break;
             } catch (NumberFormatException e) {
@@ -454,9 +550,16 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             }
         }
         if(selected==0){
-            txtAns.setText("Invalid");
-            txtQue.setText("Invalid");
-            speakOut("Invalid! "+message);
+            if(invaliedAttemps<3){
+                txtAns.setText("Invalid");
+                txtQue.setText("Invalid");
+                invaliedAttemps++;
+                speakOut("Invalid! "+message);
+            }
+            else {
+                invaliedAttemps = 0;
+                speakOut("Give your input clearly ! " + message);
+            }
         }
     }
 
@@ -479,12 +582,13 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     }
 
     // Method to get the response to add more items
-    private void addMore(ArrayList<String> s){
+    private void addMore(ArrayList<String> s) throws ParseException {
         int respond = 0;
         for(int i = 0;i<s.size();i++){
             if(s.get(i).toLowerCase().equals("yes")){
                 success = 0;
                 respond =1;
+                invaliedAttemps = 0;
                 start();
                 break;
             }
@@ -500,14 +604,24 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
                 }
                 message = message + " Total amount of the cart is "+String.valueOf(total)+" rupees.";
                 speakOut(message);
+                invaliedAttemps = 0;
                 respond =1;
+                txtAns.setText("");
+                txtQue.setText("");
                 break;
             }
         }
         if(respond==0){
-            txtAns.setText("Invalid");
-            txtQue.setText("Invalid");
-            speakOut("Invalid ! "+message);
+            if(invaliedAttemps<3){
+                txtAns.setText("Invalid");
+                txtQue.setText("Invalid");
+                invaliedAttemps++;
+                speakOut("Invalid! "+message);
+            }
+            else {
+                invaliedAttemps = 0;
+                speakOut("Give your input clearly ! " + message);
+            }
         }
     }
 
@@ -519,6 +633,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         index =1;
         success = 10;
         finished = 0;
+        invaliedAttemps = 0;
         itemListView.setVisibility(View.GONE);
         cartListView.setVisibility(View.GONE);
         shoppingAssistanceController = ShoppingAssistanceController.getInstance();

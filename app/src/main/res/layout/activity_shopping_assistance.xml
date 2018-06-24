@@ -109,7 +109,7 @@
                 <ListView
                     android:id="@+id/list_item"
                     android:layout_width="fill_parent"
-                    android:layout_height="177dp"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_marginTop="27dp"
@@ -125,7 +125,7 @@
     <ListView
         android:id="@+id/list_cart"
         android:layout_width="fill_parent"
-        android:layout_height="177dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="20dp"></ListView>
 
     <TextView
