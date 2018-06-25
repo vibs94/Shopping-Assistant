@@ -1,6 +1,8 @@
 package com.example.root.shoppingassistance.Controller;
 
 
+import android.util.Log;
+
 import com.example.root.shoppingassistance.Model.Attribute;
 import com.example.root.shoppingassistance.Model.Item;
 import com.example.root.shoppingassistance.Model.Shop;
@@ -142,7 +144,7 @@ public class ShoppingAssistanceController {
             item5.addAttribute(attribute);
             attribute = new Attribute("brand", "samsung", 2);
             item5.addAttribute(attribute);
-            attribute = new Attribute("model", "S 6", 3);
+            attribute = new Attribute("model", "S6", 3);
             item5.addAttribute(attribute);
             item5.setNoOfPurchaces(1);
 
@@ -257,7 +259,7 @@ public class ShoppingAssistanceController {
             }
             scores.set(index,Double.NEGATIVE_INFINITY);
         }
-
+        Log.e("ordered list size",String.valueOf(orderedItems.size()));
         return orderedItems;
     }
 
@@ -278,13 +280,20 @@ public class ShoppingAssistanceController {
     }
 
     // Add an item to the cart
-    public void addToCart(int index){
+    public boolean addToCart(int index){
+        Log.e("index",String.valueOf(index));
+        Log.e("random list size",String.valueOf(randomItems.size()));
+        Log.e("ordered list size",String.valueOf(orderedItems.size()));
         if(index<=orderedItems.size()) {
             cart.add(orderedItems.get(index - 1));
+            Log.e("if ordered","if ordered");
+            return true;
         }
-        else{
+        else if((index-orderedItems.size())<=randomItems.size()){
             cart.add(randomItems.get(index-orderedItems.size()-1));
+            return true;
         }
+        return false;
     }
 
     // Set the range for a given item

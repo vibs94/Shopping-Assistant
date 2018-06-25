@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.root.shoppingassistance.Controller.ShoppingAssistanceController;
@@ -32,8 +33,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
     private TextToSpeech tts;
     private Button btnStart;
     private Button btnSpeak;
-    private EditText txtAns;
-    private EditText txtQue;
+    private TextView txtAns;
+    private TextView txtQue;
     String errorMessage = "Invalid request !";
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ShoppingAssistanceController shoppingAssistanceController = ShoppingAssistanceController.getInstance();
@@ -57,8 +58,8 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
 
         tts = new TextToSpeech(this, this);
 
-        txtAns = (EditText) findViewById(R.id.txtQ);
-        txtQue = (EditText) findViewById(R.id.txtA);
+        txtAns = (TextView) findViewById(R.id.txtQ);
+        txtQue = (TextView) findViewById(R.id.txtA);
 
         // Refer 'Speak' button
         btnStart = (Button) findViewById(R.id.btnSpeak);
@@ -293,6 +294,7 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
             Log.e(s.get(i),s.get(i));
             if(shoppingAssistanceController.addToCart(s.get(i))) {
                 generateCart();
+                Log.e("cart size",String.valueOf(shoppingAssistanceController.getCart().size()));
                 selected =1;
                 invaliedAttemps = 0;
                 break;
@@ -449,7 +451,6 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         invaliedAttemps = 0;
         itemListView.setVisibility(View.GONE);
         shoppingAssistanceController = ShoppingAssistanceController.getInstance();
-        shoppingAssistanceController.init();
         speakOut(message);
     }
 
@@ -538,13 +539,14 @@ public class ShoppingAssistanceView extends AppCompatActivity implements TextToS
         for(int i=0;i<s.size();i++) {
             try {
                 int selectedItem = Integer.parseInt(s.get(i));
-                shoppingAssistanceController.addToCart(selectedItem);
-                selected = 1;
-                txtAns.setText("Selected");
-                txtQue.setText("Selected");
-                invaliedAttemps = 0;
-                generateCart();
-                break;
+                if(shoppingAssistanceController.addToCart(selectedItem)) {
+                    selected = 1;
+                    txtAns.setText("Selected");
+                    txtQue.setText("Selected");
+                    invaliedAttemps = 0;
+                    generateCart();
+                    break;
+                }
             } catch (NumberFormatException e) {
                 continue;
             }
